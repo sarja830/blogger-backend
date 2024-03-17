@@ -1,12 +1,12 @@
 package com.blog.demo.model.user;
 
 // Define enum for role types with integer values
-public enum UserType {
-    ROLE_ADMIN(1), ROLE_USER(2);
+public enum RoleType {
+    ROLE_ADMIN(2), ROLE_USER(0), ROLE_AUTHOR(2);
 
     private final int value;
 
-    UserType(int value) {
+    RoleType(int value) {
         this.value = value;
     }
 
