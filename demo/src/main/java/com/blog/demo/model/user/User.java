@@ -31,7 +31,7 @@ public class User {
     private String password;
     private Instant created;
     private boolean enabled;
-    @Column(name = "role_type"
+    @Column(name = "role_type")
     private RoleType roleType;
 
     @OneToMany(
