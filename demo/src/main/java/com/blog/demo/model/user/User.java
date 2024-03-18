@@ -22,7 +22,7 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @NotBlank(message = "name is mandatory.")
+    @NotBlank(message = "name in model is mandatory.")
     private String name;
     @NotBlank(message = "username is mandatory.")
     private String username;
@@ -31,7 +31,7 @@ public class User {
     private String password;
     private Instant created;
     private boolean enabled;
-    @Column(name = "role_type")
+    @Column(name = "role_type"
     private RoleType roleType;
 
     @OneToMany(
