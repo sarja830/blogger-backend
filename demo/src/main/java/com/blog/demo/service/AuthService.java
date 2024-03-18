@@ -6,8 +6,10 @@ import com.blog.demo.dto.AuthenticationResponse;
 import com.blog.demo.dto.LoginRequest;
 import com.blog.demo.dto.RefreshTokenRequest;
 import com.blog.demo.dto.RegisterRequest;
+import com.blog.demo.exceptions.EmailAlreadyExists;
 import com.blog.demo.model.NotificationEmail;
 import com.blog.demo.model.VerificationToken;
+import com.blog.demo.model.user.RoleType;
 import com.blog.demo.model.user.User;
 import com.blog.demo.repository.UserRepository;
 import com.blog.demo.repository.VerificationTokenRepository;
@@ -50,20 +52,36 @@ public class AuthService {
     private Environment environment;
 
 
-    public void signup(RegisterRequest registerRequest) {
-        User user = new User();
-        user.setUsername(registerRequest.getUsername());
-        user.setName(registerRequest.getName());
-        user.setEmail(registerRequest.getEmail());
-        user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
-        user.setCreated(Instant.now());
-        user.setEnabled(false);
+
+    public void signup(RegisterRequest registerRequest) throws EmailAlreadyExists  {
+
+
+        if (userRepository.findByEmail(registerRequest.getEmail()).isPresent()) {
+            throw new EmailAlreadyExists();
+        }
+        var user = User.builder()
+                .username(registerRequest.getUsername())
+                .name(registerRequest.getName())
+                .email(registerRequest.getEmail())
+                .password(passwordEncoder.encode(registerRequest.getPassword()))
+                .created(Instant.now())
+                .roleType(RoleType.ROLE_USER)
+                .enabled(false)
+                .build();
+//        User user = new User();
+//        user.setUsername(registerRequest.getUsername());
+//        user.setName(registerRequest.getName());
+//        user.setEmail(registerRequest.getEmail());
+//        user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
+//        user.setCreated(Instant.now());
+//        user.setEnabled(false);
 
         userRepository.save(user);
 
         //generate token
         String token = generateVerificationToken(user);
         log.info("Token generated: " + environment.getProperty("serverUrl"));
+
         mailService.sendMail(new NotificationEmail("Please Activate your Account",
                 user.getEmail(), "Thank you for signing up to My Blog, " +
                 "please click on the below url to activate your account : " +

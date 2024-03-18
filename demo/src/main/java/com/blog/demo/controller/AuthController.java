@@ -4,11 +4,13 @@ import com.blog.demo.dto.AuthenticationResponse;
 import com.blog.demo.dto.LoginRequest;
 import com.blog.demo.dto.RefreshTokenRequest;
 import com.blog.demo.dto.RegisterRequest;
+import com.blog.demo.exceptions.EmailAlreadyExists;
 import com.blog.demo.service.AuthService;
 import com.blog.demo.service.RefreshTokenService;
 
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,7 +25,7 @@ public class AuthController {
     private final RefreshTokenService refreshTokenService;
 
     @PostMapping("/signup")
-    public ResponseEntity<String> signup(@RequestBody RegisterRequest registerRequest) {
+    public ResponseEntity<String> signup(@RequestBody RegisterRequest registerRequest)  throws EmailAlreadyExists {
         authService.signup(registerRequest);
         return new ResponseEntity<>("User Registration Successful",
                 OK);
@@ -50,5 +52,8 @@ public class AuthController {
         refreshTokenService.deleteRefreshToken(refreshTokenRequest.getRefreshToken());
         return ResponseEntity.status(OK).body("Refresh Token Deleted Successfully!!");
     }
-
+    @ExceptionHandler
+    public ResponseEntity<String> handleEmailAlreadyExists(EmailAlreadyExists emailAlreadyExists) {
+        return new ResponseEntity<>(emailAlreadyExists.getMessage(), HttpStatus.BAD_REQUEST);
+    }
 }
