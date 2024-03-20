@@ -1,18 +1,18 @@
 package com.blog.demo.controller;
 
-import com.blog.demo.dto.AuthenticationResponse;
-import com.blog.demo.dto.LoginRequest;
-import com.blog.demo.dto.RefreshTokenRequest;
-import com.blog.demo.dto.RegisterRequest;
+import com.blog.demo.dto.*;
 import com.blog.demo.exceptions.EmailAlreadyExists;
+import com.blog.demo.exceptions.Result;
+import com.blog.demo.exceptions.StatusCode;
 import com.blog.demo.service.AuthService;
 import com.blog.demo.service.RefreshTokenService;
 
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+
 
 import static org.springframework.http.HttpStatus.OK;
 
@@ -25,21 +25,21 @@ public class AuthController {
     private final RefreshTokenService refreshTokenService;
 
     @PostMapping("/signup")
-    public ResponseEntity<String> signup(@RequestBody RegisterRequest registerRequest)  throws EmailAlreadyExists {
-        authService.signup(registerRequest);
-        return new ResponseEntity<>("User Registration Successful",
-                OK);
+    public Result signup(@RequestBody RegisterRequest registerRequest) throws EmailAlreadyExists {
+        return new Result(true, StatusCode.SUCCESS, "Account Created successfuly", this.authService.signup(registerRequest));
     }
 
-    @GetMapping("accountVerification/{token}")
-    public ResponseEntity<String> verifyAccount(@PathVariable String token) {
-        authService.verifyAccount(token);
-        return new ResponseEntity<>("Account Activated Successfully", OK);
+    @GetMapping("/accountVerification/{token}")
+    public Result verifyAccount(@PathVariable String token) {
+        return new Result(true, StatusCode.SUCCESS, "Account activated successfuly", this.authService.verifyAccount(token));
+
     }
 
     @PostMapping("/login")
-    public AuthenticationResponse login(@RequestBody LoginRequest loginRequest) {
-        return authService.login(loginRequest);
+    public Result login(@RequestBody LoginRequest loginRequest) {
+        return new Result(true, StatusCode.SUCCESS, "User Info and JSON Web Token", this.authService.login(loginRequest));
+
+//        return authService.login(loginRequest);
     }
 
     @PostMapping("/refresh/token")
@@ -52,8 +52,25 @@ public class AuthController {
         refreshTokenService.deleteRefreshToken(refreshTokenRequest.getRefreshToken());
         return ResponseEntity.status(OK).body("Refresh Token Deleted Successfully!!");
     }
-    @ExceptionHandler
-    public ResponseEntity<String> handleEmailAlreadyExists(EmailAlreadyExists emailAlreadyExists) {
-        return new ResponseEntity<>(emailAlreadyExists.getMessage(), HttpStatus.BAD_REQUEST);
+
+    @GetMapping("/resend-verification-token")
+    public Result resendVerificationToken(@RequestParam("email") String email) {
+        return new Result(true, StatusCode.SUCCESS, "User Info and JSON Web Token", this.authService.sendVerificationTokenEmail(email));
+    }
+
+    @PostMapping("/passwordResetRequest")
+    public Result resetPasswordRequest(@RequestBody RequestPasswordResetRequest requestPasswordResetRequest) {
+        return new Result(true, StatusCode.SUCCESS, "User Info and JSON Web Token", this.authService.passwordResetRequest(requestPasswordResetRequest.getEmail()));
+    }
+
+    //
+    @PostMapping("/resetPassword")
+    public Result resetPassword(@RequestBody PasswordResetRequest passwordResetRequest) {
+        return new Result(true, StatusCode.SUCCESS, "User Info and JSON Web Token", this.authService.passwordReset(passwordResetRequest));
+    }
+
+    @PostMapping("/changePassword")
+    public Result changePassword(@RequestBody ChangePasswordRequest changePasswordRequest) {
+        return new Result(true, StatusCode.SUCCESS, "User Info and JSON Web Token", this.authService.passwordChange(changePasswordRequest));
     }
 }

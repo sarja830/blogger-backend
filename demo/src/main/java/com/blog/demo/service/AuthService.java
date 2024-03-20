@@ -2,10 +2,7 @@ package com.blog.demo.service;
 
 
 
-import com.blog.demo.dto.AuthenticationResponse;
-import com.blog.demo.dto.LoginRequest;
-import com.blog.demo.dto.RefreshTokenRequest;
-import com.blog.demo.dto.RegisterRequest;
+import com.blog.demo.dto.*;
 import com.blog.demo.exceptions.EmailAlreadyExists;
 import com.blog.demo.model.NotificationEmail;
 import com.blog.demo.model.VerificationToken;
@@ -17,11 +14,10 @@ import com.blog.demo.security.JwtProvider;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.sql.ast.tree.expression.Over;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -31,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.Calendar;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -52,48 +49,46 @@ public class AuthService {
     private Environment environment;
 
 
+    public String signup(RegisterRequest registerRequest) {
 
-    public void signup(RegisterRequest registerRequest) throws EmailAlreadyExists  {
+
+        if (userRepository.findByEmail(registerRequest.getEmail()).isPresent() )
+            throw  new AccountStatusException("Email is already taken.") {
+                @Override
+                public String getMessage() {
+                    return super.getMessage();
+                }
+            };
+
+        if(userRepository.findByEmail(registerRequest.getUsername()).isPresent())
+            throw  new AccountStatusException("Username is already taken.") {
+                @Override
+                public String getMessage() {
+                    return super.getMessage();
+                }
+            };
 
 
-        if (userRepository.findByEmail(registerRequest.getEmail()).isPresent()) {
-            throw new EmailAlreadyExists();
-        }
         var user = User.builder()
                 .username(registerRequest.getUsername())
                 .name(registerRequest.getName())
                 .email(registerRequest.getEmail())
                 .password(passwordEncoder.encode(registerRequest.getPassword()))
                 .created(Instant.now())
-                .roleType(RoleType.ROLE_USER)
+                .roleType(RoleType.USER)
                 .enabled(false)
                 .build();
-//        User user = new User();
-//        user.setUsername(registerRequest.getUsername());
-//        user.setName(registerRequest.getName());
-//        user.setEmail(registerRequest.getEmail());
-//        user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
-//        user.setCreated(Instant.now());
-//        user.setEnabled(false);
 
         userRepository.save(user);
 
         //generate token
-        String token = generateVerificationToken(user);
-        log.info("Token generated: " + environment.getProperty("serverUrl"));
-
+        String token = generateVerificationTokenAndSave(user);
+//        publisher.publishEvent(new RegistrationCompleteEvent(user, applicationUrl(request)));
         mailService.sendMail(new NotificationEmail("Please Activate your Account",
                 user.getEmail(), "Thank you for signing up to My Blog, " +
                 "please click on the below url to activate your account : " +
-                environment.getProperty("serverUrl") + token));
-    }
-
-    @Transactional(readOnly = true)
-    public User getCurrentUser() {
-        Jwt principal = (Jwt) SecurityContextHolder.
-                getContext().getAuthentication().getPrincipal();
-        return userRepository.findByUsername(principal.getSubject())
-                .orElseThrow(() -> new UsernameNotFoundException("User name not found - " + principal.getSubject()));
+                environment.getProperty("account.activation") + token));
+        return "Account Created Successfuly, Please check your email to activate your account";
     }
 
     private void fetchUserAndEnable(VerificationToken verificationToken) {
@@ -101,27 +96,25 @@ public class AuthService {
         User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found with name - " + username));
         user.setEnabled(true);
         userRepository.save(user);
+        verificationTokenRepository.delete(verificationToken);
     }
 
-    private String generateVerificationToken(User user) {
-        String token = UUID.randomUUID().toString();
-        VerificationToken verificationToken = new VerificationToken();
-        verificationToken.setToken(token);
-        verificationToken.setUser(user);
-
-        verificationTokenRepository.save(verificationToken);
-        return token;
+    public String verifyAccount(String token) {
+        VerificationToken verificationToken = verificationTokenRepository.findByToken(token)
+                .orElseThrow(() -> new BadCredentialsException("Token is invalid"));
+        Calendar calendar = Calendar.getInstance();
+        if ((verificationToken.getExpirationTime().getTime()-calendar.getTime().getTime())<= 0)
+        {
+            throw new BadCredentialsException("The activation link is expired request for a new one");
+        }
+        fetchUserAndEnable(verificationToken);
+        return "Account Activated Successfully";
     }
-
-    public void verifyAccount(String token) {
-        Optional<VerificationToken> verificationToken = verificationTokenRepository.findByToken(token);
-        fetchUserAndEnable(verificationToken.orElseThrow(() -> new RuntimeException("Invalid Token")));
-    }
-
     public AuthenticationResponse login(LoginRequest loginRequest) {
         Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(),
                 loginRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authenticate);
+        log.info(isLoggedIn()?"Hi":"hello" );
         String token = jwtProvider.generateToken(authenticate);
         return AuthenticationResponse.builder()
                 .authenticationToken(token)
@@ -129,6 +122,62 @@ public class AuthService {
                 .expiresAt(Instant.now().plusMillis(jwtProvider.getJwtExpirationInMillis()))
                 .username(loginRequest.getUsername())
                 .build();
+    }
+
+    public String passwordResetRequest(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new BadCredentialsException("Email is invalid"));
+
+        if (!user.isEnabled())
+            throw new AccountStatusException("Account is not activated, please, activate your account to reset your password") {
+                @Override
+                public String getMessage() {
+                    return super.getMessage();
+                }
+            };
+        verificationTokenRepository.deleteByUser(user.getId());
+        String passwordResetToken = generateVerificationTokenAndSave(user);
+        mailService.sendMail(new NotificationEmail("Password Reset Request",
+                user.getEmail(), "Please click on the below url to reset your password : " +
+                environment.getProperty("password.reset")+"?token=" + passwordResetToken));
+
+        return "Password reset link has been sent to your email, please, Follow the instructions to change your password";
+    }
+
+
+
+    @Transactional
+    public String passwordChange(ChangePasswordRequest changePasswordRequest) {
+        Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(changePasswordRequest.getUsername(),
+                changePasswordRequest.getOldPassword()));
+        SecurityContextHolder.getContext().setAuthentication(authenticate);
+//        User user = getCurrentUser();
+
+        User user = userRepository.findByUsername(changePasswordRequest.getUsername())
+                .orElseThrow(() -> new UsernameNotFoundException("User name not found." ));
+        user.setPassword(passwordEncoder.encode(changePasswordRequest.getNewPassword()));
+        userRepository.save(user);
+        return "Password changed successfully";
+    }
+
+    @Transactional
+    public String passwordReset(PasswordResetRequest passwordResetRequest){
+
+        User user = userRepository.findByEmail(passwordResetRequest.getEmail())
+                .orElseThrow(() -> new BadCredentialsException("Email is invalid"));
+
+        VerificationToken verificationToken = verificationTokenRepository.findByUserAndToken(user,passwordResetRequest.getToken())
+                .orElseThrow(() -> new BadCredentialsException("Bad Credentials"));
+
+        Calendar calendar = Calendar.getInstance();
+        if ((verificationToken.getExpirationTime().getTime()-calendar.getTime().getTime())<= 0)
+        {
+            throw new BadCredentialsException("The password reset link is expired request for a new one");
+        }
+        user.setPassword(passwordEncoder.encode(passwordResetRequest.getPassword()));
+        userRepository.save(user);
+        verificationTokenRepository.delete(verificationToken);
+        return "Password reset successfully";
     }
 
     public AuthenticationResponse refreshToken(RefreshTokenRequest refreshTokenRequest) {
@@ -146,5 +195,43 @@ public class AuthService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return !(authentication instanceof AnonymousAuthenticationToken) && authentication.isAuthenticated();
     }
+    @Transactional(readOnly = true)
+    public User getCurrentUser() {
+        Jwt principal = (Jwt) SecurityContextHolder.
+                getContext().getAuthentication().getPrincipal();
+        return userRepository.findByUsername(principal.getSubject())
+                .orElseThrow(() -> new UsernameNotFoundException("User name not found - " + principal.getSubject()));
+    }
+    public String sendVerificationTokenEmail(String email) {
+
+        Optional<User> userOptional = userRepository.findByEmail(email);
+        User user = userOptional
+                .orElseThrow(() -> new UsernameNotFoundException("No user " +
+                        "Found with email : " + email));
+        if (user.isEnabled())
+            throw  new AccountStatusException("Account is not activated.") {
+                @Override
+                public String getMessage() {
+                    return super.getMessage();
+                }
+            };
+
+        verificationTokenRepository.deleteByUser(user.getId());
+        String token = generateVerificationTokenAndSave(user);
+        mailService.sendMail(new NotificationEmail("Please Reset your Password",
+                user.getEmail(), "Thank you for signing up to My Blog, " +
+                "please click on the below url to activate your account : " +
+                environment.getProperty("account.activation")+ token));
+
+        return "A password Reset link has been sent to your email, please, check to Reset your account Password";
+    }
+
+    private String generateVerificationTokenAndSave(User user) {
+        String token = UUID.randomUUID().toString();
+        VerificationToken verificationToken = new VerificationToken(token,user);
+        verificationTokenRepository.save(verificationToken);
+        return token;
+    }
+
 
 }

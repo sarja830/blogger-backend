@@ -35,6 +35,7 @@ public class User {
     private String password;
     private Instant created;
     private boolean enabled;
+    @Enumerated(EnumType.ORDINAL)
     @Column(name = "role_type")
     private RoleType roleType;
 

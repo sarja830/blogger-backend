@@ -8,3 +8,14 @@ Design for comment and category: https://stackoverflow.com/questions/56358596/un
 
 
 Change the pub private key
+https://stackoverflow.com/questions/19303584/spring-security-preauthorization-pass-enums-in-directly
+
+
+
+
+AUthentication failure: 401
+Access Denied 403
+
+Handling exceptions in spring security excellent tutorial: https://www.youtube.com/watch?v=sCYoQIBND6w
+
+Psswrod reset: https://www.youtube.com/watch?v=mxs_00KpUE4
