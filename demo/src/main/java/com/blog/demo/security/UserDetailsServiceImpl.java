@@ -53,7 +53,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
 //    #TODO changes for role has been made here
     private Collection<? extends GrantedAuthority> getAuthorities(String role) {
-            return singletonList(new SimpleGrantedAuthority("ROLE_" + role));
-
+            log.info(role);
+            return singletonList(new SimpleGrantedAuthority(role));
     }
 }

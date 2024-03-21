@@ -19,3 +19,7 @@ Access Denied 403
 Handling exceptions in spring security excellent tutorial: https://www.youtube.com/watch?v=sCYoQIBND6w
 
 Psswrod reset: https://www.youtube.com/watch?v=mxs_00KpUE4
+
+
+COnverter to add custom attributes to authority : https://stackoverflow.com/questions/76702695/spring-security-preauthorize-role-does-not-pick-up-jwt-claim
+https://stackoverflow.com/questions/65518172/spring-security-cant-extract-roles-from-jwt

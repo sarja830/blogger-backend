@@ -39,13 +39,12 @@ public class AuthController {
     public Result login(@RequestBody LoginRequest loginRequest) {
         return new Result(true, StatusCode.SUCCESS, "User Info and JSON Web Token", this.authService.login(loginRequest));
 
-//        return authService.login(loginRequest);
     }
 
-    @PostMapping("/refresh/token")
-    public AuthenticationResponse refreshTokens(@Valid @RequestBody RefreshTokenRequest refreshTokenRequest) {
-        return authService.refreshToken(refreshTokenRequest);
-    }
+//    @PostMapping("/refresh/token")
+//    public AuthenticationResponse refreshTokens(@Valid @RequestBody RefreshTokenRequest refreshTokenRequest) {
+//        return authService.refreshToken(refreshTokenRequest);
+//    }
 
     @PostMapping("/logout")
     public ResponseEntity<String> logout(@Valid @RequestBody RefreshTokenRequest refreshTokenRequest) {

@@ -180,16 +180,16 @@ public class AuthService {
         return "Password reset successfully";
     }
 
-    public AuthenticationResponse refreshToken(RefreshTokenRequest refreshTokenRequest) {
-        refreshTokenService.validateRefreshToken(refreshTokenRequest.getRefreshToken());
-        String token = jwtProvider.generateTokenWithUserName(refreshTokenRequest.getUsername());
-        return AuthenticationResponse.builder()
-                .authenticationToken(token)
-                .refreshToken(refreshTokenRequest.getRefreshToken())
-                .expiresAt(Instant.now().plusMillis(jwtProvider.getJwtExpirationInMillis()))
-                .username(refreshTokenRequest.getUsername())
-                .build();
-    }
+//    public AuthenticationResponse refreshToken(RefreshTokenRequest refreshTokenRequest) {
+//        refreshTokenService.validateRefreshToken(refreshTokenRequest.getRefreshToken());
+//        String token = jwtProvider.generateTokenWithUserName(refreshTokenRequest.getUsername(), refreshTokenRequest
+//        return AuthenticationResponse.builder()
+//                .authenticationToken(token)
+//                .refreshToken(refreshTokenRequest.getRefreshToken())
+//                .expiresAt(Instant.now().plusMillis(jwtProvider.getJwtExpirationInMillis()))
+//                .username(refreshTokenRequest.getUsername())
+//                .build();
+//    }
 
     public boolean isLoggedIn() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -206,10 +206,9 @@ public class AuthService {
 
         Optional<User> userOptional = userRepository.findByEmail(email);
         User user = userOptional
-                .orElseThrow(() -> new UsernameNotFoundException("No user " +
-                        "Found with email : " + email));
+                .orElseThrow(() -> new UsernameNotFoundException("No user Found with email : " + email));
         if (user.isEnabled())
-            throw  new AccountStatusException("Account is not activated.") {
+            throw  new AccountStatusException("Account is already activated.") {
                 @Override
                 public String getMessage() {
                     return super.getMessage();
