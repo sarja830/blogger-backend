@@ -33,6 +33,7 @@ public class Result {
         this.data = data;
     }
 
+
     public boolean isFlag() {
         return flag;
     }

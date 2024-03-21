@@ -59,8 +59,9 @@ public class Blog {
     Set<Vote> votes;
 
     // one to many unidirectional relationship
-    @OneToMany (mappedBy = "blog")
-    private Set<Comment> comments;
+    // instead call the api in the front get all comments by blog id
+//    @OneToMany (mappedBy = "blog")
+//    private Set<Comment> comments;
 
     @ManyToOne
     @JoinColumn(name = "category_id")

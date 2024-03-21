@@ -1,44 +1,65 @@
-package com.blog.demo.service;
-
-import com.blog.demo.dto.BlogRequestDTO;
-import com.blog.demo.model.blog.Blog;
-import com.blog.demo.model.blog.BlogContent;
-import com.blog.demo.repository.BlogContentRepository;
-import com.blog.demo.repository.BlogRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
-@Service
-@RequiredArgsConstructor
-@Slf4j
-public class BlogService {
-
-    private final BlogContentRepository blogContentRepository;
-    private final BlogRepository blogRepository;
-    public void save(BlogRequestDTO blogRequestDTO) {
-        Blog blog = new Blog();
-        BlogContent blogContent = new BlogContent();
-        blogContent.builder()
-                .content(blogRequestDTO.getContent())
-                .build();
-        log.info("Product {} is created ",blogContent.getId());
-        blogContentRepository.save(blogContent);
-        blog.builder()
-                .title(blogRequestDTO.getTitle())
-                .banner(blogRequestDTO.getBanner())
-                .content(blogRequestDTO.getContent())
-//                .tags(blogRequestDTO.getTags())
-                .draft(blogRequestDTO.getDraft())
-                .id(blogRequestDTO.getId())
-                .contentId(blogContent.getId())
-                .build();
-
-
-//        #TODO  handle duplicates in the future
-//        Blog blog = blogRepository.findByName(postRequest.getBlogName())
-//                .orElseThrow(() -> new BlogNotFoundException(postRequest.getBlogName()));
-//        blogRepository.save(postMapper.map(postRequest, subreddit, authService.getCurrentUser()));
-    }
-
-}
+//package com.blog.demo.service;
+//
+//
+//import com.blog.demo.dto.BlogDTO;
+//import com.blog.demo.model.blog.Blog;
+//import com.blog.demo.repository.BlogRepository;
+//import lombok.AllArgsConstructor;
+//import lombok.extern.slf4j.Slf4j;
+//import org.springframework.security.core.userdetails.UsernameNotFoundException;
+//import org.springframework.stereotype.Service;
+//import org.springframework.transaction.annotation.Transactional;
+//
+//import java.util.ArrayList;
+//import java.util.LinkedList;
+//import java.util.List;
+//import java.util.Queue;
+//
+//
+//@Service
+//@Slf4j
+//@AllArgsConstructor
+//@Transactional
+// //@Transactional is applied to every public individual method. Private and Protected methods are Ignored by Spring.
+//public class BlogService {
+//    private final BlogRepository blogRepository;
+//
+//    public Blog createBlog(BlogDTO blogDTO) {
+//
+//        return  blogRepository.save(blog);
+//    }
+//    // it can form a cycle in the blog hierarchy
+//    // a child of parent cannot be a child;
+//    public Blog updateBlog(BlogDTO blogDTO) {
+//
+//        Blog blog = blogRepository.findById(blogDTO.getId()).orElseThrow(() -> new UsernameNotFoundException("Blog id is not valid"));
+//        if(blogDTO.getParentId() != null){
+//            Blog parentBlog = blogRepository.findById(blogDTO .getParentId()).orElseThrow(() -> new UsernameNotFoundException("Parent blog not found"));
+//            //fetching all the children of blog id and checking if the parent id is not a child of its own children
+//            Queue<Blog> queue = new LinkedList<>(blogRepository.findAllByParentId(blogDTO.getId()));
+//            while(!queue.isEmpty()){
+//                Blog temp = queue.poll();
+//                if(temp.getId().equals(blogDTO.getParentId()))
+//                    throw new RuntimeException("Parent blog cannot be a child of its own children");
+//                queue.addAll(blogRepository.findAllByParentId(temp.getId()));
+//            }
+//            blog.setParentId(blogDTO.getParentId());
+//        }
+//        if(blogDTO.getName()!=null) blog.setName(blogDTO.getName());
+//        return blogRepository.save(blog);
+//
+//    }
+//    public void deleteBlog(Long blogId) {
+//        blogRepository.deleteById(blogId);
+//    }
+//
+//    public List<Blog> getBlog(Long blogId) {
+//        List<Blog> blogList = new ArrayList<>();
+//        if(blogId!=null)
+//             blogList.add(blogRepository.findById(blogId).orElseThrow(() -> new UsernameNotFoundException("Blog id is not valid")));
+//        else
+//            blogList.addAll(blogRepository.findAll());
+//
+//        return blogList;
+//    }
+//}

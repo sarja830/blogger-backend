@@ -9,7 +9,10 @@ import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.time.Instant;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -22,14 +25,15 @@ public class Comment {
     @Lob
     private String comment;
 
-
+    private Instant createdDate;
+    private Instant updatedDate;
     @ManyToOne
     @JoinColumn(name = "parent_id")
     private Comment parentCommentId;
 
     @OneToMany(mappedBy = "parentCommentId",
             cascade = { CascadeType.REMOVE, CascadeType.PERSIST} )
-    private List<Comment> children;
+    private Set<Comment> children;
 //    @OneToOne
 //    @JoinColumn(name = "parent_id")
 //    private Comment parentCommentId;
@@ -43,4 +47,8 @@ public class Comment {
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "blog_id", referencedColumnName = "id", nullable = false)
     private Blog blog;
+
+
+
+
 }
