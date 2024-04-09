@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 public class JwtProvider {
 
     private final JwtEncoder jwtEncoder;
+
     @Value("${jwt.expiration.time}")
     private Long jwtExpirationInMillis;
 

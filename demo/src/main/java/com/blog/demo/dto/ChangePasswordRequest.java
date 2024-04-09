@@ -15,12 +15,12 @@ public class ChangePasswordRequest {
 
     @NotBlank
     private String username;
-    @JsonProperty(value="old_password")
+
     @NotBlank
     @NotNull
     private String oldPassword;
 
-    @JsonProperty(value="new_password")
+
     @NotBlank
     private String newPassword;
 }

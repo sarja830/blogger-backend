@@ -10,6 +10,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.Instant;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -25,8 +26,8 @@ public class Comment {
     @Lob
     private String comment;
 
-    private Instant createdDate;
-    private Instant updatedDate;
+    private Date createdDate;
+    private Date updatedDate;
     @ManyToOne
     @JoinColumn(name = "parent_id")
     private Comment parentCommentId;

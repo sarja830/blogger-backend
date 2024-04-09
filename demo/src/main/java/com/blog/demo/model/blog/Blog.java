@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 import org.w3c.dom.stylesheets.LinkStyle;
 
 import java.time.Instant;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -32,28 +33,31 @@ public class Blog {
     @Column(name = "content_id")
     private String contentId;
 
+    private String description;
     @Column(name = "vote_count")
     private Integer voteCount;
+    @Column(name = "comment_count")
+    private Integer commentCount;
     @Column(name = "view_count")
     private  Integer viewCount;
     private String banner;
-    private String content;
+//    private String content;
 
-    @Lob
-    @Nullable
-    private String description;
+//    @Lob
+//    @Nullable
+//    private String description;
     @NotBlank(message = "title is mandatory.")
     private String title;
 
     private boolean draft;
 
     // name is the name of the column in the current table
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User author;
-    private Instant created;
+    private Date created;
     @Column(name = "last_updated")
-    private Instant lastUpdated;
+    private Date lastUpdated;
 
     @OneToMany(mappedBy = "blog")
     Set<Vote> votes;
@@ -63,8 +67,8 @@ public class Blog {
 //    @OneToMany (mappedBy = "blog")
 //    private Set<Comment> comments;
 
-    @ManyToOne
-    @JoinColumn(name = "category_id")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "category_id", referencedColumnName = "id")
     private Category category;
 
 }

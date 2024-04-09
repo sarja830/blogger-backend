@@ -9,7 +9,10 @@ import com.blog.demo.service.RefreshTokenService;
 
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -18,6 +21,7 @@ import static org.springframework.http.HttpStatus.OK;
 
 @RestController
 @RequestMapping("/api/auth")
+@Slf4j
 @AllArgsConstructor
 public class AuthController {
 
@@ -35,8 +39,9 @@ public class AuthController {
 
     }
 
-    @PostMapping("/login")
+    @PostMapping("/signin")
     public Result login(@RequestBody LoginRequest loginRequest) {
+
         return new Result(true, StatusCode.SUCCESS, "User Info and JSON Web Token", this.authService.login(loginRequest));
 
     }

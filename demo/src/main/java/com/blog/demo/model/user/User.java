@@ -1,8 +1,11 @@
 package com.blog.demo.model.user;
 
 
+import com.blog.demo.dto.Views;
+import com.blog.demo.model.BlogVoteId;
 import com.blog.demo.model.Vote;
 import com.blog.demo.model.blog.Blog;
+import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -12,7 +15,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
+import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @Data
@@ -32,23 +37,40 @@ public class User {
     @NotBlank(message = "email is mandatory.")
     @Column(unique=true)
     private String email;
+
+
+    private String profileImage = "";
+
+    @JsonView(Views.Internal.class)
+
     private String password;
-    private Instant created;
+    private Date created;
     private boolean enabled;
     @Enumerated(EnumType.ORDINAL)
     @Column(name = "role_type")
     private RoleType roleType;
 
-    @OneToMany(
-            mappedBy = "author",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
-    List<Blog> blogs;
-//
-//     i dont want comments by user
-//     its better to have a unidirectional relationship  Instead replace one direction with an explicit query in you DAO/Repository. Keeps the model simpler and if done correctly via interfaces the application clean of circular dependencies
-//    #TODO can it be list
-//    @OneToMany(mappedBy = "blog")
-//    Set<Vote> blogLikes;
+//    @OneToMany(
+//            mappedBy = "author",
+//            cascade = CascadeType.ALL,
+//            orphanRemoval = true
+//    )
+//    List<Blog> blogs;
+
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass())
+            return false;
+
+        User that = (User) o;
+        return Objects.equals(id, this.id);
+
+    }
 }

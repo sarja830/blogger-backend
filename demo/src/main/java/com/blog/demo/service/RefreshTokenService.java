@@ -2,7 +2,9 @@ package com.blog.demo.service;
 
 
 import com.blog.demo.model.RefreshToken;
+import com.blog.demo.model.user.User;
 import com.blog.demo.repository.RefreshTokenRepository;
+import com.blog.demo.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,12 +18,13 @@ import java.util.UUID;
 public class RefreshTokenService {
 
     private final RefreshTokenRepository refreshTokenRepository;
+    private final UserRepository userRepository;
 
-    public RefreshToken generateRefreshToken() {
+    public RefreshToken generateRefreshToken(String username) {
         RefreshToken refreshToken = new RefreshToken();
         refreshToken.setToken(UUID.randomUUID().toString());
         refreshToken.setCreatedDate(Instant.now());
-
+        refreshToken.setUser(userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found")));
         return refreshTokenRepository.save(refreshToken);
     }
 

@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
+import java.util.Date;
 
 @Data
 @AllArgsConstructor
@@ -15,7 +16,7 @@ public class CommentsDTO {
         private Long id;
         @JsonProperty(value="blog_id")
         private Long blogId;
-        private Instant createdDate;
+        private Date createdDate;
         @NotBlank
         private String comment;
         @JsonProperty(value="user_id")

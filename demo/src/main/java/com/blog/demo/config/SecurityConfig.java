@@ -48,15 +48,17 @@ public class SecurityConfig {
 //    @Value("${api.endpoint.base-url}")
 //    private String baseUrl;
 
-//    @Value("${jwt.public.key}")
-//    RSAPublicKey publicKey;
+    @Value("${jwt.public.key}")
+    RSAPublicKey publicKey;
 
 
-    private final RSAPublicKey publicKey;
+//    #TODO  remove this before production
+//    private final RSAPublicKey publicKey;
 
-    private final RSAPrivateKey privateKey;
-//    @Value("${jwt.private.key}")
-//    RSAPrivateKey privateKey;
+
+//    private final RSAPrivateKey privateKey;
+    @Value("${jwt.private.key}")
+    RSAPrivateKey privateKey;
 
 
     private final CustomBasicAuthenticationEntryPoint customBasicAuthenticationEntryPoint;
@@ -91,17 +93,23 @@ public class SecurityConfig {
                 .httpBasic(httpBasic->httpBasic.authenticationEntryPoint(this.customBasicAuthenticationEntryPoint))
                 .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "api/blogs/").permitAll()
+                        .requestMatchers(HttpMethod.GET, "api/blogs/count").permitAll()
+                        .requestMatchers(HttpMethod.GET, "api/blogs").permitAll()
+                        .requestMatchers(HttpMethod.GET, "api/blogs/blogId/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "api/blogs/author/blogId/**").hasAnyRole("ADMIN", "AUTHOR")
+                        .requestMatchers(HttpMethod.GET, "api/blogs/author/count").hasAnyRole("ADMIN", "AUTHOR")
+                        .requestMatchers(HttpMethod.GET, "api/blogs/author").hasAnyRole("ADMIN", "AUTHOR")
                         .requestMatchers(HttpMethod.GET, "api/blogs/search").permitAll()
-                        .requestMatchers(HttpMethod.POST, "api/blogs/").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "api/blogs/").hasAnyRole("ADMIN", "USER", "AUTHOR")
-                        .requestMatchers(HttpMethod.PUT, "api/blogs/").hasAnyRole("ADMIN", "AUTHOR")
-                        .requestMatchers(HttpMethod.POST, "api/comments/").hasAnyRole("ADMIN", "USER", "AUTHOR")
-                        .requestMatchers(HttpMethod.DELETE, "api/comments/").hasAnyRole("ADMIN", "USER", "AUTHOR")
-                        .requestMatchers(HttpMethod.PUT, "api/comments/").hasAnyRole("ADMIN", "USER", "AUTHOR")
-                        .requestMatchers(HttpMethod.POST, "api/votes/").hasAnyRole("ADMIN", "USER", "AUTHOR")
-                        .requestMatchers(HttpMethod.DELETE, "api/votes/").hasAnyRole("ADMIN", "USER", "AUTHOR")
-                        .requestMatchers(HttpMethod.PUT, "api/votes/").hasAnyRole("ADMIN", "USER", "AUTHOR")
+                        .requestMatchers(HttpMethod.POST, "api/images").hasAnyRole("ADMIN", "AUTHOR")
+                        .requestMatchers(HttpMethod.POST, "api/blogs").hasAnyRole("ADMIN", "AUTHOR")
+                        .requestMatchers(HttpMethod.DELETE, "api/blogs").hasAnyRole("ADMIN", "USER", "AUTHOR")
+                        .requestMatchers(HttpMethod.PUT, "api/blogs").hasAnyRole("ADMIN", "AUTHOR")
+                        .requestMatchers(HttpMethod.POST, "api/comments").hasAnyRole("ADMIN", "USER", "AUTHOR")
+                        .requestMatchers(HttpMethod.DELETE, "api/comments").hasAnyRole("ADMIN", "USER", "AUTHOR")
+                        .requestMatchers(HttpMethod.PUT, "api/comments").hasAnyRole("ADMIN", "USER", "AUTHOR")
+                        .requestMatchers(HttpMethod.POST, "api/votes").hasAnyRole("ADMIN", "USER", "AUTHOR")
+                        .requestMatchers(HttpMethod.DELETE, "api/votes").hasAnyRole("ADMIN", "USER", "AUTHOR")
+                        .requestMatchers(HttpMethod.PUT, "api/votes").hasAnyRole("ADMIN", "USER", "AUTHOR")
                         .requestMatchers(HttpMethod.GET, "api/categories").permitAll()
 //                        .requestMatchers(HttpMethod.POST, "api/categories").hasRole("ADMIN")
 //                        .requestMatchers(HttpMethod.DELETE, "api/categories").hasRole("ADMIN")

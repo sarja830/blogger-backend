@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -53,7 +54,7 @@ public class AuthService {
 
 
         if (userRepository.findByEmail(registerRequest.getEmail()).isPresent() )
-            throw  new AccountStatusException("Email is already taken.") {
+            throw  new AccountStatusException("Email is already taken. if you are already registered, please, Validate your email.") {
                 @Override
                 public String getMessage() {
                     return super.getMessage();
@@ -74,7 +75,7 @@ public class AuthService {
                 .name(registerRequest.getName())
                 .email(registerRequest.getEmail())
                 .password(passwordEncoder.encode(registerRequest.getPassword()))
-                .created(Instant.now())
+                .created(new Date())
                 .roleType(RoleType.USER)
                 .enabled(false)
                 .build();
@@ -114,13 +115,13 @@ public class AuthService {
         Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(),
                 loginRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authenticate);
-        log.info(isLoggedIn()?"Hi":"hello" );
         String token = jwtProvider.generateToken(authenticate);
         return AuthenticationResponse.builder()
                 .authenticationToken(token)
-                .refreshToken(refreshTokenService.generateRefreshToken().getToken())
+//                .refreshToken(refreshTokenService.generateRefreshToken(loginRequest.getUsername()).getToken())
                 .expiresAt(Instant.now().plusMillis(jwtProvider.getJwtExpirationInMillis()))
                 .username(loginRequest.getUsername())
+                .role(userRepository.findByUsername(loginRequest.getUsername()).get().getRoleType().name())
                 .build();
     }
 
