@@ -232,6 +232,12 @@ public class AuthService {
         verificationTokenRepository.save(verificationToken);
         return token;
     }
+    public User getUserFromJwt(Jwt jwt) {
+        if(jwt==null)
+            throw new UsernameNotFoundException("User not found. Invalid token");
+        String username = (String) jwt.getClaims().get("sub");
+        return userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    }
 
 
 }

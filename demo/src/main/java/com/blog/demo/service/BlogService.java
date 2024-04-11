@@ -26,10 +26,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 
 @Service
@@ -40,12 +37,11 @@ import java.util.List;
 public class BlogService {
     private final BlogRepository blogRepository;
     private final BlogContentRepository blogContentRepository;
-    private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
 
 
-    public Blog createBlog(BlogDTO blogDTO,  Jwt jwt) {
-        User author =  getUserFromJwt(jwt);
+    public Blog createBlog(BlogDTO blogDTO,  User author) {
+
 
         if(blogDTO.getCategoryId()==null)
             throw new RuntimeException("Category id is mandatory to create a blog");
@@ -86,13 +82,13 @@ public class BlogService {
             throw new UsernameNotFoundException("Failed to create blog");
         }
     }
-    public Blog updateBlog(BlogDTO blogDTO,  Jwt jwt) {
+    public Blog updateBlog(BlogDTO blogDTO, User author) {
         Category category = null;
         if(blogDTO.getCategoryId()!=null)
             category = categoryRepository.findById(blogDTO.getCategoryId()).orElseThrow(() -> new UsernameNotFoundException("Category id is not valid"));
         if(blogDTO.getId()==null)
             throw new UsernameNotFoundException("Blog id is mandatory to update a blog");
-        User author =  getUserFromJwt(jwt);
+
         Blog blog = blogRepository.findById(blogDTO.getId()).orElseThrow(() -> new UsernameNotFoundException("Blog id is not valid"));
 
         BlogContent blogContent = blogContentRepository.findById(blog.getContentId()).orElseThrow(() -> new UsernameNotFoundException("Blog content id is not valid"));
@@ -122,10 +118,10 @@ public class BlogService {
         return blogRepository.save(blog);
     }
     //only owner and admin can delete the blog
-    public void deleteBlog(Long blogId,  Jwt jwt) {
+    public void deleteBlog(Long blogId,  User author) {
 //        check the user with blog before deleting
         Blog blog = blogRepository.findById(blogId).orElseThrow(() -> new UsernameNotFoundException("Blog id is not valid"));
-        if(getUserFromJwt(jwt).equals(blog.getAuthor()))
+        if(author.equals(blog.getAuthor()))
             throw new UsernameNotFoundException("You are not authorized to delete this blog");
         blogRepository.deleteById(blogId);
     }
@@ -149,21 +145,21 @@ public class BlogService {
         Long count = blogRepository.countByDraftAndAuthorIdIn(draft, authorIds );
         return count;
     }
-    public List<BlogDTO> getBlogsByCategory( List<Integer> categoryIds, Integer page, Integer pageSize) {
+    public List<BlogDTO> getBlogsByCategory(Set<Long> categoryIds, Integer page, Integer pageSize) {
         Pageable pageable = PageRequest.of(page, pageSize);
         Page<Blog> blogs = blogRepository.findByCategoryIdInAndDraft(categoryIds, false, pageable);
         return blogDTOList(blogs);
     }
-    public Long countBlogsByCategory( List<Integer> categoryIds) {
+    public Long countBlogsByCategory( Set<Long> categoryIds) {
         Long count  = blogRepository.countByCategoryIdInAndDraft(categoryIds, false);
         return count;
     }
-    public List<BlogDTO> getBlogsByDraftAuthorCategory(Boolean draft,List<Long> authorId, List<Integer> categoryIds, Integer page, Integer pageSize ){
+    public List<BlogDTO> getBlogsByDraftAuthorCategory(Boolean draft,List<Long> authorId, Set<Long> categoryIds, Integer page, Integer pageSize ){
         Pageable pageable = PageRequest.of(page,pageSize);
         Page<Blog> blogs = blogRepository. findByDraftAndAuthorIdInAndCategoryIdIn(draft, authorId,categoryIds,pageable);
         return blogDTOList(blogs);
     }
-    public Long countBlogsByDraftAuthorCategory(Boolean draft, List<Long> authorId, List<Integer> categoryIds){
+    public Long countBlogsByDraftAuthorCategory(Boolean draft, List<Long> authorId, Set<Long> categoryIds){
         Long count  = blogRepository.countByDraftAndAuthorIdInAndCategoryIdIn(draft, authorId,categoryIds);
         return count;
     }
@@ -264,12 +260,7 @@ public class BlogService {
 
         return blogDTOList;
     }
-    public User getUserFromJwt(Jwt jwt) {
-        if(jwt==null)
-            throw new UsernameNotFoundException("User not found. Invalid token");
-        String username = (String) jwt.getClaims().get("sub");
-        return userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
-    }
+
     List<BlogDTO> blogDTOList( Page<Blog> blogs )
     {
         List<BlogDTO> blogDTOList = new LinkedList<>();

@@ -13,7 +13,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @Data
 @Embeddable
-public class BlogVoteId
+public class BlogUserId
         implements Serializable {
 
     @Column(name = "blog_id")
@@ -32,7 +32,7 @@ public class BlogVoteId
         if (o == null || getClass() != o.getClass())
             return false;
 
-        BlogVoteId that = (BlogVoteId) o;
+        BlogUserId that = (BlogUserId) o;
         return Objects.equals(blogId, that.blogId) &&
                 Objects.equals(userId, that.userId);
     }

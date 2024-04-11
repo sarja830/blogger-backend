@@ -18,6 +18,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.server.resource.InvalidBearerTokenException;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
+import org.springframework.web.ErrorResponseException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -47,6 +48,17 @@ public class ExceptionHandlerAdvice {
         return new Result(false, StatusCode.NOT_FOUND, ex.getMessage());
     }
 
+
+    @ExceptionHandler(ErrorResponseException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    Result handleErrorResponseException(ErrorResponseException ex) {
+
+        String message = ex.getMessage();
+        String message1 = ex.getCause().getMessage();
+        return new Result(false, ex.getStatusCode().value(), message1);
+
+//        return new Result(false, StatusCode.INVALID_ARGUMENT, "Provided arguments are invalid, see data for details.");
+    }
     /**
      * This handles invalid inputs.
      *

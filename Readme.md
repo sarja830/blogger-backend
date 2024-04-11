@@ -1,4 +1,4 @@
-Projections: 
+Projections:
 https://stackoverflow.com/questions/22007341/spring-jpa-selecting-specific-columns
 
 
@@ -12,6 +12,7 @@ https://stackoverflow.com/questions/19303584/spring-security-preauthorization-pa
 
 
 
+n+1 query problem : https://vladmihalcea.com/n-plus-1-query-problem/
 
 AUthentication failure: 401
 Access Denied 403
@@ -23,3 +24,8 @@ Psswrod reset: https://www.youtube.com/watch?v=mxs_00KpUE4
 
 COnverter to add custom attributes to authority : https://stackoverflow.com/questions/76702695/spring-security-preauthorize-role-does-not-pick-up-jwt-claim
 https://stackoverflow.com/questions/65518172/spring-security-cant-extract-roles-from-jwt
+
+
+### Project Documentation:
+voteType = 1 -> upvote
+voteType = 2 -> downvote

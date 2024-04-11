@@ -2,7 +2,6 @@ package com.blog.demo.model.user;
 
 
 import com.blog.demo.dto.Views;
-import com.blog.demo.model.BlogVoteId;
 import com.blog.demo.model.Vote;
 import com.blog.demo.model.blog.Blog;
 import com.fasterxml.jackson.annotation.JsonView;

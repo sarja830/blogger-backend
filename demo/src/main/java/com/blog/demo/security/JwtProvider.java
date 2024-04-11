@@ -43,7 +43,10 @@ public class JwtProvider {
                 .subject(username)
                 .claim("authorities", authorities)
                 .build();
-
+        log.info("claims: " + claims);
+        for(String key: claims.getClaims().keySet()){
+            log.info("key: " + key + " value: " + claims.getClaims().get(key));
+        }
         return this.jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
     }
 

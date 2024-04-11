@@ -7,10 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 ;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Repository
 public interface BlogRepository extends JpaRepository<Blog, Long> {
@@ -25,10 +22,10 @@ public interface BlogRepository extends JpaRepository<Blog, Long> {
     Long countByDraft(Boolean draft);
     Page<Blog> findByDraftAndAuthorIdIn(Boolean draft,List<Long> authorIds, Pageable pageable);
     Long countByDraftAndAuthorIdIn(Boolean draft,List<Long> authorIds);
-    Page<Blog> findByDraftAndAuthorIdInAndCategoryIdIn(Boolean draft,List<Long> authorId, List<Integer> categoryId, Pageable pageable);
-    Long countByDraftAndAuthorIdInAndCategoryIdIn(Boolean draft,List<Long> authorId, List<Integer> categoryId);
-    Page<Blog> findByCategoryIdInAndDraft(Collection<Integer> categoryIds, Boolean draft, Pageable pageable);
-    Long countByCategoryIdInAndDraft(Collection<Integer> categoryIds, Boolean draft);
+    Page<Blog> findByDraftAndAuthorIdInAndCategoryIdIn(Boolean draft, List<Long> authorId, Set<Long> categoryIds, Pageable pageable);
+    Long countByDraftAndAuthorIdInAndCategoryIdIn(Boolean draft,List<Long> authorId, Set<Long> categoryIds);
+    Page<Blog> findByCategoryIdInAndDraft(Collection<Long> categoryIds, Boolean draft, Pageable pageable);
+    Long countByCategoryIdInAndDraft(Collection<Long> categoryIds, Boolean draft);
     List<Blog> findAll();
     Page<Blog>  findByAuthor(Long authorId, Pageable pageable);
 
