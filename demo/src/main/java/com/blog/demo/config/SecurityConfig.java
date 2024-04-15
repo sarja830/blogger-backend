@@ -104,6 +104,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/blogs").hasAnyRole("ADMIN", "AUTHOR")
                         .requestMatchers(HttpMethod.DELETE, "/api/blogs").hasAnyRole("ADMIN", "USER", "AUTHOR")
                         .requestMatchers(HttpMethod.PUT, "/api/blogs").hasAnyRole("ADMIN", "AUTHOR")
+                        .requestMatchers(HttpMethod.GET, "/api/comments").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/comments").hasAnyRole("ADMIN", "USER", "AUTHOR")
                         .requestMatchers(HttpMethod.DELETE, "/api/comments").hasAnyRole("ADMIN", "USER", "AUTHOR")
                         .requestMatchers(HttpMethod.PUT, "/api/comments").hasAnyRole("ADMIN", "USER", "AUTHOR")

@@ -11,18 +11,25 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.Instant;
 import java.util.Date;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CommentsDTO{
-        private Long id;
+public class CommentRequestDTO{
+
+        @NotNull
+        private Long blogId;
+        @Lob
+        @NotBlank
         private String comment;
-        private Date createdDate;
-        private Date updatedDate;
-        private Comment parentComment;
-        private User commentor;
-        private Blog blog;
+
+        @JsonProperty(value="parentId")
+        private Long parentCommentId;
+        //for returning
+
 }
+
+
+
+

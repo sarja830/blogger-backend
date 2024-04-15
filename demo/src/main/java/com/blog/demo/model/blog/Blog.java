@@ -59,8 +59,8 @@ public class Blog {
     @Column(name = "last_updated")
     private Date lastUpdated;
 
-    @OneToMany(mappedBy = "blog")
-    Set<Vote> votes;
+//    @OneToMany(mappedBy = "blog")
+//    Set<Vote> votes;
 
     // one to many unidirectional relationship
     // instead call the api in the front get all comments by blog id

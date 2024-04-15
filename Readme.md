@@ -25,7 +25,54 @@ Psswrod reset: https://www.youtube.com/watch?v=mxs_00KpUE4
 COnverter to add custom attributes to authority : https://stackoverflow.com/questions/76702695/spring-security-preauthorize-role-does-not-pick-up-jwt-claim
 https://stackoverflow.com/questions/65518172/spring-security-cant-extract-roles-from-jwt
 
+For sorting and pagination
+https://www.baeldung.com/spring-data-jpa-pagination-sorting
+
+For comments:
+https://codesandbox.io/p/github/swastikpatro/nested-comments/main?file=%2Fsrc%2FApp.tsx%3A3%2C18
+
+
+
+#### JPA's cascade = REMOVE and Hibernate's @OnDelete used together?
+Let's say you have a one-to-one directional relationship
+```java
+class House {
+
+    @OneToOne
+    Object door;
+
+}
+```
+If you use CascadeType.REMOVE then deleting the house will also delete the door.
+```java
+    @OneToOne(cascade=CascadeType.REMOVE)
+    Object door;
+```
+If you use @OnDelete then deleting the door will also delete the house.
+```java
+    @OneToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    Object door;
+```
+
+```
 
 ### Project Documentation:
 voteType = 1 -> upvote
 voteType = 2 -> downvote
+
+### DONE
+1. Completed Auth end to end including jwt token and 
+1. Implemented  Blog fetching
+2. Implemented Blog CRUD
+3. Implemented blog like and dislike
+
+## TODO
+1. Integrate comments in frontend and backend
+2. Check docker persistence for deployign application
+3. Implement view count logic
+4. Implement sorting in blog fetching 
+5. Search functionality - elastic search
+3. Check for jmeter to test application
+
+

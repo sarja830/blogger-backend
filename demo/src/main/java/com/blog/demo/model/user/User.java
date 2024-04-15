@@ -4,6 +4,7 @@ package com.blog.demo.model.user;
 import com.blog.demo.dto.Views;
 import com.blog.demo.model.Vote;
 import com.blog.demo.model.blog.Blog;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
@@ -40,8 +41,7 @@ public class User {
 
     private String profileImage = "";
 
-    @JsonView(Views.Internal.class)
-
+    @JsonIgnore
     private String password;
     private Date created;
     private boolean enabled;
