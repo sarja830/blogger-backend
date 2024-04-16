@@ -61,7 +61,7 @@ public class VoteService {
     public void castVote( VoteDTO voteDTO, @AuthenticationPrincipal Jwt jwt) {
         User user = authService.getUserFromJwt(jwt);
 
-        Blog blog = blogRepository.findById(voteDTO.getBlogId()).orElseThrow(() -> new ErrorResponseException(HttpStatus.BAD_REQUEST,new Throwable("Blog doesn't exist")));
+        Blog blog = blogRepository.getReferenceById(voteDTO.getBlogId()); //.orElseThrow(() -> new ErrorResponseException(HttpStatus.BAD_REQUEST,new Throwable("Blog doesn't exist")));
         if(blog.getAuthor().getId().equals(user.getId()))
             throw new ErrorResponseException(HttpStatus.CONFLICT,new Throwable("you can not vote on your own blog"));
 
@@ -72,7 +72,7 @@ public class VoteService {
             if(vote.getVoteType().ordinal() == voteDTO.getVoteType()-1)
                 throw  new ErrorResponseException(HttpStatus.CONFLICT, new Throwable("You have already voted"));
             vote.setVoteType(VoteType.values()[voteDTO.getVoteType() - 1]);
-            voteRepository.save(vote);
+
         }
         else {
             vote = Vote.builder()
@@ -81,8 +81,8 @@ public class VoteService {
                     .voter(user)
                     .voteType(VoteType.values()[voteDTO.getVoteType() - 1])
                     .build();
-            voteRepository.save(vote);
         }
+        voteRepository.save(vote);
         Long totalVotes  = voteRepository.countByBlogIdAndVoteType(voteDTO.getBlogId(), VoteType.UPVOTE);
         blog.setVoteCount(totalVotes.intValue());
         blogRepository.save(blog);

@@ -27,17 +27,16 @@ public class BlogController {
     private final BlogService blogService;
     private final AuthService authService;
     private final CategoryService categoryService;
-    //    @GetMapping("")
-//    public Result getBlogs(@RequestParam(value = "blog_id",required = false) Long id) {
-//        return new Result(true, StatusCode.SUCCESS, "Fetched blog hierarchy successfully",this.blogService.getBlog(id));
-//    }
+
     @GetMapping("")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public Result getBlogsPublic(
             @RequestParam(value="page",required=true,defaultValue="0") Integer page,
             @RequestParam(value="page_size",required=true,defaultValue="5") Integer pageSize,
             @RequestParam(value="category_id",required=false) List<Long> categoryIds,
-            @RequestParam(value="author_id",required=false) List<Long> authorIds
+            @RequestParam(value="author_id",required=false) List<Long> authorIds,
+            @RequestParam(value="filter",required=false) String filter,
+            @RequestParam(value="value",required=false) String value
     )
     {
         Set<Long> allCategoryIds = new HashSet<>();
@@ -45,7 +44,7 @@ public class BlogController {
             allCategoryIds = categoryService.getChildCategories(categoryIds);
 
         if(categoryIds==null && authorIds==null)
-            return new Result(true, StatusCode.SUCCESS, "Fetched blog hierarchy successfully",this.blogService.getBlogs(false,page,pageSize));
+            return new Result(true, StatusCode.SUCCESS, "Fetched blog hierarchy successfully",this.blogService.getBlogs(false,page,pageSize,filter,value));
         else if(categoryIds!=null && authorIds!=null)
             return new Result(true, StatusCode.SUCCESS, "Fetched blog hierarchy successfully",this.blogService.getBlogsByDraftAuthorCategory(false,authorIds,allCategoryIds,page,pageSize));
         else if(categoryIds!=null)
@@ -63,6 +62,8 @@ public class BlogController {
             @RequestParam(value="page_size",required=true,defaultValue="5") Integer pageSize,
             @RequestParam(value="category_id",required=false) List<Long> categoryIds,
             @RequestParam(value="draft",required=true,defaultValue="true") Boolean draft,
+            @RequestParam(value="filter",required=false) String filter,
+            @RequestParam(value="value",required=false) String value,
             @AuthenticationPrincipal Jwt jwt
     )
     {
@@ -73,7 +74,7 @@ public class BlogController {
         User author = authService.getUserFromJwt(jwt);
         List<Long> authorIds = List.of(author.getId());
         if(categoryIds==null && authorIds==null)
-            return new Result(true, StatusCode.SUCCESS, "Fetched blog hierarchy successfully",this.blogService.getBlogs(draft,page,pageSize));
+            return new Result(true, StatusCode.SUCCESS, "Fetched blog hierarchy successfully",this.blogService.getBlogs(draft,page,pageSize,filter,value));
         else if(categoryIds!=null && authorIds!=null)
             return new Result(true, StatusCode.SUCCESS, "Fetched blog hierarchy successfully",this.blogService.getBlogsByDraftAuthorCategory(draft,authorIds,allCategoryIds,page,pageSize));
         else if(categoryIds!=null)
@@ -147,7 +148,8 @@ public class BlogController {
     @ResponseStatus(HttpStatus.ACCEPTED)
     public Result createBlog(@RequestBody BlogDTO blogDTO,@AuthenticationPrincipal Jwt jwt) {
         User author =  authService.getUserFromJwt(jwt);
-        return new Result(true, StatusCode.SUCCESS, "Blog created successfully", this.blogService.createBlog(blogDTO,author));
+        blogService.createBlog(blogDTO,author);
+        return new Result(true, StatusCode.SUCCESS, "Blog created successfully");
     }
     //    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     @DeleteMapping("")
@@ -160,6 +162,7 @@ public class BlogController {
     @PutMapping("")
     public Result updateBlog(@RequestBody BlogDTO blogDTO,@AuthenticationPrincipal Jwt jwt) {
         User author =  authService.getUserFromJwt(jwt);
-        return new Result(true, StatusCode.SUCCESS, "Blog updated successfully", this.blogService.updateBlog(blogDTO,author));
+        blogService.updateBlog(blogDTO,author);
+        return new Result(true, StatusCode.SUCCESS, "Blog updated successfully");
     }
 }

@@ -28,7 +28,7 @@ public class VoteController {
     }
     @GetMapping("")
     @ResponseStatus(HttpStatus.CREATED)
-    public Result castVoteOnBlog(
+    public Result getVotesOfBlog(
             @RequestParam(value="blogId",required=true) Long blogId,
             @AuthenticationPrincipal Jwt jwt)
     {

@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface VoteRepository  extends JpaRepository<Vote, Long> {
+public interface VoteRepository  extends JpaRepository<Vote, BlogUserId> {
     void deleteById(BlogUserId blogUserId);
     Long countByBlogIdAndVoteType(Long blogId, VoteType voteType);
     Optional<Vote> findById(BlogUserId blogVoteId);

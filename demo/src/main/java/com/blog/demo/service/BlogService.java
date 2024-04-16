@@ -3,6 +3,7 @@ package com.blog.demo.service;
 
 import com.blog.demo.dto.AuthorDTO;
 import com.blog.demo.dto.BlogDTO;
+
 import com.blog.demo.model.Category;
 import com.blog.demo.model.blog.Blog;
 import com.blog.demo.model.blog.BlogContent;
@@ -11,20 +12,19 @@ import com.blog.demo.repository.BlogContentRepository;
 import com.blog.demo.repository.BlogRepository;
 import com.blog.demo.repository.CategoryRepository;
 
-import com.blog.demo.repository.UserRepository;
-import com.nimbusds.jose.proc.SecurityContext;
-import jakarta.annotation.Nullable;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.ErrorResponseException;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 
@@ -40,12 +40,16 @@ public class BlogService {
     private final CategoryRepository categoryRepository;
 
 
-    public Blog createBlog(BlogDTO blogDTO,  User author) {
+    public void createBlog(BlogDTO blogDTO,  User author) {
 
 
         if(blogDTO.getCategoryId()==null)
             throw new RuntimeException("Category id is mandatory to create a blog");
-        Category category = categoryRepository.findById(blogDTO.getCategoryId()).orElseThrow(() -> new UsernameNotFoundException("Category id is not valid"));
+
+        // not working
+        Category category = categoryRepository.getReferenceById(blogDTO.getCategoryId());
+//        Category category = categoryRepository.findById(blogDTO.getCategoryId()).orElseThrow(() -> new ErrorResponseException(HttpStatus.NOT_FOUND,new Throwable("Category doesn't exist")));
+
 
         BlogContent blogContentBuild = BlogContent.builder()
                 .content(blogDTO.getContent())
@@ -73,7 +77,8 @@ public class BlogService {
                     .lastUpdated(new Date())
                     .build();
 
-            return blogRepository.save(blog);
+            blogRepository.save(blog);
+            return;
         }
         catch (Exception e)
         {
@@ -82,10 +87,10 @@ public class BlogService {
             throw new UsernameNotFoundException("Failed to create blog");
         }
     }
-    public Blog updateBlog(BlogDTO blogDTO, User author) {
+    public void updateBlog(BlogDTO blogDTO, User author) {
         Category category = null;
         if(blogDTO.getCategoryId()!=null)
-            category = categoryRepository.findById(blogDTO.getCategoryId()).orElseThrow(() -> new UsernameNotFoundException("Category id is not valid"));
+            category = categoryRepository.getReferenceById(blogDTO.getCategoryId());
         if(blogDTO.getId()==null)
             throw new UsernameNotFoundException("Blog id is mandatory to update a blog");
 
@@ -115,7 +120,8 @@ public class BlogService {
         if(category!=null)
             blog.setCategory(category);
         blog.setLastUpdated(new Date());
-        return blogRepository.save(blog);
+         blogRepository.save(blog);
+         return;
     }
     //only owner and admin can delete the blog
     public void deleteBlog(Long blogId,  User author) {
@@ -127,8 +133,34 @@ public class BlogService {
     }
 
 
-    public List<BlogDTO> getBlogs(Boolean draft,Integer page, Integer pageSize){
-        Pageable pageable = PageRequest.of(page,pageSize);
+    Sort filters(String name, String value) {
+        Sort sort;
+
+        if(name!=null && name.equals("created"))
+            sort =  Sort.by("created");
+        else if(name!=null && name.equals("created"))
+            sort =  Sort.by("created");
+        else if(name!=null && name.equals("viewCount"))
+            sort =  Sort.by("viewCount");
+        else if(name!=null && name.equals("voteCount"))
+            sort =  Sort.by("voteCount");
+        else if(name!=null && name.equals("commentCount"))
+            sort =  Sort.by("commentCount");
+        else
+            sort =  Sort.by("created");
+
+
+
+        if(value!=null && value.equals("asc"))
+            return sort.ascending();
+        else
+            return sort.descending();
+
+    }
+
+    public List<BlogDTO> getBlogs(Boolean draft,Integer page, Integer pageSize,String name, String value) {
+        Sort sort =  filters(name,value);
+        Pageable pageable = PageRequest.of(page,pageSize,sort);
         Page<Blog> blogs = blogRepository.findByDraft(draft, pageable);
         return blogDTOList(blogs);
     }
@@ -137,7 +169,7 @@ public class BlogService {
         return count;
     }
     public List<BlogDTO> getBlogsByAuthor(Boolean draft,List<Long> authorIds, Integer page, Integer pageSize ){
-        Pageable pageable = PageRequest.of(page,pageSize);
+        Pageable pageable = PageRequest.of(page,pageSize,filters("created","desc"));
         Page<Blog> blogs = blogRepository.findByDraftAndAuthorIdIn(draft, authorIds ,pageable);
         return blogDTOList(blogs);
     }
@@ -146,7 +178,7 @@ public class BlogService {
         return count;
     }
     public List<BlogDTO> getBlogsByCategory(Set<Long> categoryIds, Integer page, Integer pageSize) {
-        Pageable pageable = PageRequest.of(page, pageSize);
+        Pageable pageable = PageRequest.of(page, pageSize,filters("created","desc"));
         Page<Blog> blogs = blogRepository.findByCategoryIdInAndDraft(categoryIds, false, pageable);
         return blogDTOList(blogs);
     }
@@ -155,7 +187,7 @@ public class BlogService {
         return count;
     }
     public List<BlogDTO> getBlogsByDraftAuthorCategory(Boolean draft,List<Long> authorId, Set<Long> categoryIds, Integer page, Integer pageSize ){
-        Pageable pageable = PageRequest.of(page,pageSize);
+        Pageable pageable = PageRequest.of(page,pageSize,filters("created","desc"));
         Page<Blog> blogs = blogRepository. findByDraftAndAuthorIdInAndCategoryIdIn(draft, authorId,categoryIds,pageable);
         return blogDTOList(blogs);
     }
@@ -174,6 +206,8 @@ public class BlogService {
     public BlogDTO getBlogByIdPublic(Long blogId) {
         Blog blog = blogRepository.findByIdAndDraft(blogId,false).orElseThrow(() -> new UsernameNotFoundException("Blog id is not valid"));
         BlogContent blogContent = blogContentRepository.findById(blog.getContentId()).orElseThrow(() -> new UsernameNotFoundException("Blog content id is not valid"));
+        blog.setViewCount(blog.getViewCount()+1);
+        blogRepository.save(blog);
         return BlogDTO.builder()
                 .title(blog.getTitle())
                 .banner(blog.getBanner())

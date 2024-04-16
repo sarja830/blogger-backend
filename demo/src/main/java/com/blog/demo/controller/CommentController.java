@@ -1,6 +1,7 @@
 package com.blog.demo.controller;
 
 import com.blog.demo.dto.CommentRequestDTO;
+import com.blog.demo.dto.UpdateCommentRequestDTO;
 import com.blog.demo.dto.VoteDTO;
 import com.blog.demo.exceptions.Result;
 import com.blog.demo.exceptions.StatusCode;
@@ -18,10 +19,6 @@ import org.springframework.web.bind.annotation.*;
 public class CommentController {
 
     private final CommentService commentService;
-//    @GetMapping("")
-//    public Result getComments(HttpServletRequest request) {
-//        return new Result();
-//    }
 
 
     @PostMapping("")
@@ -29,6 +26,25 @@ public class CommentController {
     public Result postComment(@RequestBody CommentRequestDTO commentRequestDTO, @AuthenticationPrincipal Jwt jwt)
     {
         return new Result(true, StatusCode.SUCCESS, "comment posted successfully",commentService.createComment(commentRequestDTO,jwt));
+    }
+
+
+
+    @DeleteMapping("")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public Result deleteComment(@RequestParam Long id,@AuthenticationPrincipal Jwt jwt)
+    {
+        commentService.deleteComment(id,jwt);
+        return new Result(true, StatusCode.SUCCESS, "comment posted successfully");
+    }
+
+    @PutMapping("")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public Result updateComment(@RequestBody UpdateCommentRequestDTO updateCommentRequestDTO,
+                                @AuthenticationPrincipal Jwt jwt)
+    {
+        commentService.updateComment(updateCommentRequestDTO,jwt);
+        return new Result(true, StatusCode.SUCCESS, "comment posted successfully");
     }
 
     @GetMapping("")
@@ -40,13 +56,4 @@ public class CommentController {
         return new Result(true, StatusCode.SUCCESS,"" , commentService.getComments(blogId));
     }
 
-//    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
-    @DeleteMapping("")
-    public Result deleteComment(HttpServletRequest request) {
-        return new Result();
-    }
-    @PutMapping("")
-    public Result updateComment(HttpServletRequest request) {
-        return new Result();
-    }
 }

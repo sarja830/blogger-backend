@@ -10,7 +10,7 @@ Design for comment and category: https://stackoverflow.com/questions/56358596/un
 Change the pub private key
 https://stackoverflow.com/questions/19303584/spring-security-preauthorization-pass-enums-in-directly
 
-
+https://vladmihalcea.com/the-best-way-to-map-a-onetomany-association-with-jpa-and-hibernate/
 
 n+1 query problem : https://vladmihalcea.com/n-plus-1-query-problem/
 
@@ -55,7 +55,12 @@ If you use @OnDelete then deleting the door will also delete the house.
     Object door;
 ```
 
-```
+### JPA and Hibernate
+FindByID antiPattern: https://vladmihalcea.com/spring-data-jpa-findbyid/
+The differences between Spring Data JPA’s save, saveAndFlush and saveAll methods: https://thorben-janssen.com/spring-data-jpa-save-saveandflush-and-saveall/
+Entity Lifecycle Model in JPA & Hibernate: https://thorben-janssen.com/entity-lifecycle-model/
+
+
 
 ### Project Documentation:
 voteType = 1 -> upvote
