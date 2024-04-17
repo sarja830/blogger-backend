@@ -19,12 +19,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.ErrorResponseException;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 
@@ -84,7 +83,7 @@ public class BlogService {
         {
             log.error(e.getMessage());
             blogContentRepository.deleteById(blogContent.getId());
-            throw new UsernameNotFoundException("Failed to create blog");
+            throw new ErrorResponseException(HttpStatus.INTERNAL_SERVER_ERROR,new Throwable("Failed to create blog"));
         }
     }
     public void updateBlog(BlogDTO blogDTO, User author) {
@@ -92,13 +91,13 @@ public class BlogService {
         if(blogDTO.getCategoryId()!=null)
             category = categoryRepository.getReferenceById(blogDTO.getCategoryId());
         if(blogDTO.getId()==null)
-            throw new UsernameNotFoundException("Blog id is mandatory to update a blog");
+            throw new ErrorResponseException(HttpStatus.BAD_REQUEST,new Throwable("Blog id is mandatory to update a blog"));
 
-        Blog blog = blogRepository.findById(blogDTO.getId()).orElseThrow(() -> new UsernameNotFoundException("Blog id is not valid"));
+        Blog blog = blogRepository.findById(blogDTO.getId()).orElseThrow(() -> new ErrorResponseException(HttpStatus.NOT_FOUND,new Throwable("Blog id is not valid")));
 
-        BlogContent blogContent = blogContentRepository.findById(blog.getContentId()).orElseThrow(() -> new UsernameNotFoundException("Blog content id is not valid"));
+        BlogContent blogContent = blogContentRepository.findById(blog.getContentId()).orElseThrow(() -> new ErrorResponseException(HttpStatus.NOT_FOUND,new Throwable("Blog content id is not valid")));
         if(!blog.getAuthor().getId().equals(author.getId()) )
-            throw new UsernameNotFoundException("You are not authorized to update this blog");
+            throw new ErrorResponseException(HttpStatus.UNAUTHORIZED,new Throwable("You are not authorized to update this blog"));
         if(blogDTO.getContent()!=null)
             blogContent.setContent(blogDTO.getContent());
 
@@ -126,9 +125,9 @@ public class BlogService {
     //only owner and admin can delete the blog
     public void deleteBlog(Long blogId,  User author) {
 //        check the user with blog before deleting
-        Blog blog = blogRepository.findById(blogId).orElseThrow(() -> new UsernameNotFoundException("Blog id is not valid"));
+        Blog blog = blogRepository.findById(blogId).orElseThrow(() -> new ErrorResponseException(HttpStatus.NOT_FOUND,new Throwable("Blog id is not valid")));
         if(author.equals(blog.getAuthor()))
-            throw new UsernameNotFoundException("You are not authorized to delete this blog");
+            throw new ErrorResponseException(HttpStatus.UNAUTHORIZED,new Throwable("You are not authorized to delete this blog"));
         blogRepository.deleteById(blogId);
     }
 
@@ -204,8 +203,8 @@ public class BlogService {
 //    }
 
     public BlogDTO getBlogByIdPublic(Long blogId) {
-        Blog blog = blogRepository.findByIdAndDraft(blogId,false).orElseThrow(() -> new UsernameNotFoundException("Blog id is not valid"));
-        BlogContent blogContent = blogContentRepository.findById(blog.getContentId()).orElseThrow(() -> new UsernameNotFoundException("Blog content id is not valid"));
+        Blog blog = blogRepository.findByIdAndDraft(blogId,false).orElseThrow(() -> new ErrorResponseException(HttpStatus.BAD_REQUEST,new Throwable("Blog id is not valid")));
+        BlogContent blogContent = blogContentRepository.findById(blog.getContentId()).orElseThrow(() -> new ErrorResponseException(HttpStatus.NOT_FOUND,new Throwable("Blog content id is not valid")));
         blog.setViewCount(blog.getViewCount()+1);
         blogRepository.save(blog);
         return BlogDTO.builder()
@@ -232,8 +231,8 @@ public class BlogService {
                 .build();
     }
     public BlogDTO getBlogByIdByAuthor(Long blogId,Long userId) {
-        Blog blog = blogRepository.findByIdAndAuthorId(blogId,userId).orElseThrow(() -> new UsernameNotFoundException("Blog id is not valid"));
-        BlogContent blogContent = blogContentRepository.findById(blog.getContentId()).orElseThrow(() -> new UsernameNotFoundException("Blog content id is not valid"));
+        Blog blog = blogRepository.findByIdAndAuthorId(blogId,userId).orElseThrow(() -> new ErrorResponseException(HttpStatus.BAD_REQUEST,new Throwable("Blog id is not valid")));
+        BlogContent blogContent = blogContentRepository.findById(blog.getContentId()).orElseThrow(() -> new ErrorResponseException(HttpStatus.BAD_REQUEST,new Throwable("Blog content id is not valid")));
         return BlogDTO.builder()
                 .title(blog.getTitle())
                 .banner(blog.getBanner())
@@ -267,7 +266,7 @@ public class BlogService {
         List<BlogDTO> blogDTOList = new LinkedList<>();
         for(Blog b: blog)
         {
-            BlogContent blogContent = blogContentRepository.findById(b.getContentId()).orElseThrow(() -> new UsernameNotFoundException("Blog content id is not valid"));
+            BlogContent blogContent = blogContentRepository.findById(b.getContentId()).orElseThrow(() -> new ErrorResponseException(HttpStatus.NOT_FOUND,new Throwable("Blog content id is not valid")));
             blogDTOList.add(BlogDTO.builder()
                     .title(b.getTitle())
                     .banner(b.getBanner())
@@ -300,7 +299,7 @@ public class BlogService {
         List<BlogDTO> blogDTOList = new LinkedList<>();
         for(Blog b: blogs)
         {
-            BlogContent blogContent = blogContentRepository.findById(b.getContentId()).orElseThrow(() -> new UsernameNotFoundException("Blog content id is not valid"));
+            BlogContent blogContent = blogContentRepository.findById(b.getContentId()).orElseThrow(() -> new ErrorResponseException(HttpStatus.NOT_FOUND,new Throwable("Blog content id is not valid")));
             blogDTOList.add(BlogDTO.builder()
                     .title(b.getTitle())
                     .banner(b.getBanner())

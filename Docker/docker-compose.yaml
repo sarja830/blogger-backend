@@ -1,0 +1,54 @@
+---
+version: '3.7'
+services:
+  ## MySQL Docker Compose Config
+  postgres-blog:
+    container_name: postgres-blog
+    image: postgres:16.2
+    environment:
+      POSTGRES_DB: blog
+      POSTGRES_USER: blogadmin
+      POSTGRES_PASSWORD: postgres_password
+      #   all the data related to postgres will be saved in /data/postgres
+      PGDATA: /data/postgres
+    volumes:
+#   this will be persisted in my local machine in  postgres-blog directory
+      - ./postgres-blog:/data/postgres
+
+    expose:
+      - "5432"
+    ports:
+      - "5432:5432"
+    ##   docker should know postgres should run in port 5432 required when running on different port other than 5432
+    #    command: -p 5432
+    restart: always
+
+  ## Mongo Docker Compose Config
+  mongo:
+    container_name: mongo
+    image: mongo:7.0
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongadmin
+      MONGO_INITDB_ROOT_PASSWORD: mongo_password
+    restart: always
+    ports:
+      - "27017:27017"
+    expose:
+      - "27017"
+    # data will be persisted in my local machine in mongo-data directory
+    volumes:
+      - ./mongo-data:/data/db
+
+  minio:
+    image: quay.io/minio/minio:latest
+    volumes:
+      - ./minio-data:/minio/data
+    ports:
+      - 9000:9000
+      - 9001:9001
+    environment:
+      MINIO_ROOT_USER: 'minio_user'
+      MINIO_ROOT_PASSWORD: 'minio_password'
+      MINIO_ADDRESS: ':9000'
+      MINIO_CONSOLE_ADDRESS: ':9001'
+    command: minio server /minio/data

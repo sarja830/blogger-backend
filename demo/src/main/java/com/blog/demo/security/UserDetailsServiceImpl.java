@@ -5,7 +5,9 @@ import com.blog.demo.model.user.User;
 import com.blog.demo.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AccountStatusException;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,6 +15,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.ErrorResponseException;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -27,20 +30,15 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     @Transactional(readOnly = true)
-    public UserDetails loadUserByUsername(String username) {
+    public UserDetails loadUserByUsername(String username) throws ErrorResponseException{
         Optional<com.blog.demo.model.user.User> userOptional = userRepository.findByUsername(username);
         User user = userOptional
                 .orElseThrow(() -> new UsernameNotFoundException("No user " +
                         "Found with username : " + username));
         if(!user.isEnabled())
-        {
-            throw  new AccountStatusException("User is not enabled. Please verify your email Address.") {
-                @Override
-                public String getMessage() {
-                    return super.getMessage();
-                }
-            };
-        }
+            throw new InternalAuthenticationServiceException("User is not enabled. Please verify your email Address.");
+
+
         // authorization check is performed here
         log.info(user.getRoleType().name());
         log.info(user.getRoleType().toString());

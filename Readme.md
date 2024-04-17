@@ -80,4 +80,38 @@ voteType = 2 -> downvote
 5. Search functionality - elastic search
 3. Check for jmeter to test application
 
+### Docker Compose    
+https://www.youtube.com/watch?v=gFjpv-nZO0U
 
+
+DEPLOYMENT:
+```
+ssh root@104.236.197.121      
+
+ docker-compose -f docker-compose-minio.yml -d
+```
+
+create new bucket blog and update the access to custom:
+get the access keys for the bucket
+```
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "PublicRead",
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": [
+                    "*"
+                ]
+            },
+            "Action": [
+                "s3:GetObject"
+            ],
+            "Resource": [
+                "arn:aws:s3:::blog/*"
+            ]
+        }
+    ]
+}
+```

@@ -129,18 +129,12 @@ public class AuthService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new BadCredentialsException("Email is invalid"));
 
-        if (!user.isEnabled())
-            throw new AccountStatusException("Account is not activated, please, activate your account to reset your password") {
-                @Override
-                public String getMessage() {
-                    return super.getMessage();
-                }
-            };
+
         verificationTokenRepository.deleteByUser(user.getId());
         String passwordResetToken = generateVerificationTokenAndSave(user);
         mailService.sendMail(new NotificationEmail("Password Reset Request",
                 user.getEmail(), "Please click on the below url to reset your password : " +
-                environment.getProperty("password.reset")+"?token=" + passwordResetToken));
+                environment.getProperty("password.reset")+ user.getEmail()+"/"+ passwordResetToken+"/"));
 
         return "Password reset link has been sent to your email, please, Follow the instructions to change your password";
     }
@@ -168,7 +162,7 @@ public class AuthService {
                 .orElseThrow(() -> new BadCredentialsException("Email is invalid"));
 
         VerificationToken verificationToken = verificationTokenRepository.findByUserAndToken(user,passwordResetRequest.getToken())
-                .orElseThrow(() -> new BadCredentialsException("Bad Credentials"));
+                .orElseThrow(() -> new BadCredentialsException("Invalid Token"));
 
         Calendar calendar = Calendar.getInstance();
         if ((verificationToken.getExpirationTime().getTime()-calendar.getTime().getTime())<= 0)
