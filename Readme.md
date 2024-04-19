@@ -1,4 +1,55 @@
+
+
+### Blogger-Infrastucture-Setup
+
+For deployment of resource to remote server just typoe in
+1. Dont rerun it run it once during startup
+
+3. From local to server
+```shell 
+scp docker-compose.yaml root@104.236.197.121:/
+```
+2. copy the docker compose to the server and then run the
+```shell
+docker compose up -d
+```
+
+### DEPLOYMENT:
+1. The project is build on java 17
+2. export JAVA_HOME=`/usr/libexec/java_home -v 17` run this command if needed
+3. Run a build locally using. ```mvn clean package``` with the updated properties
+4. Refer https://spring.io/guides/topicals/spring-boot-docker
+5. On the server run the following commands to deploy the application
+
+   ```shell
+   // to build a local image
+   docker build  -t blog/backendappv1 .
+   // to run the local image
+   docker run -p 8080:8080 blog/backendappv1
+   // to list the old images
+   docker images 
+   // delete the old version once the new version has been setup
+    docker rmi 1af15e84ae97
+    ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Projections:
+
+
+
+
 https://stackoverflow.com/questions/22007341/spring-jpa-selecting-specific-columns
 
 
@@ -51,7 +102,7 @@ If you use CascadeType.REMOVE then deleting the house will also delete the door.
 If you use @OnDelete then deleting the door will also delete the house.
 ```java
     @OneToOne
-    @OnDelete(action = OnDeleteAction.CASCADE)
+@OnDelete(action = OnDeleteAction.CASCADE)
     Object door;
 ```
 
@@ -67,7 +118,7 @@ voteType = 1 -> upvote
 voteType = 2 -> downvote
 
 ### DONE
-1. Completed Auth end to end including jwt token and 
+1. Completed Auth end to end including jwt token and
 1. Implemented  Blog fetching
 2. Implemented Blog CRUD
 3. Implemented blog like and dislike
@@ -76,11 +127,11 @@ voteType = 2 -> downvote
 1. Integrate comments in frontend and backend
 2. Check docker persistence for deployign application
 3. Implement view count logic
-4. Implement sorting in blog fetching 
+4. Implement sorting in blog fetching
 5. Search functionality - elastic search
 3. Check for jmeter to test application
 
-### Docker Compose    
+### Docker Compose
 https://www.youtube.com/watch?v=gFjpv-nZO0U
 
 

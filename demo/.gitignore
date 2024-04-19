@@ -1,5 +1,11 @@
 HELP.md
-target/
+target/classes
+target/test-classes
+target/maven-status
+target/maven-archiver
+target/surefire-reports
+target/generated-sources
+target/generated-test-sources
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
@@ -26,6 +32,9 @@ target/
 /nbdist/
 /.nb-gradle/
 build/
+../Docker/minio-data/
+../Docker/mongo-data/
+../Docker/postgres-data/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
