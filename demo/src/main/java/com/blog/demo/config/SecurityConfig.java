@@ -48,17 +48,17 @@ public class SecurityConfig {
 //    @Value("${api.endpoint.base-url}")
 //    private String baseUrl;
 
-    @Value("${jwt.public.key}")
-    RSAPublicKey publicKey;
+//    @Value("${jwt.public.key}")
+//    RSAPublicKey publicKey;
 
 
 //    #TODO  remove this before production
-//    private final RSAPublicKey publicKey;
+    private final RSAPublicKey publicKey;
 
 
-//    private final RSAPrivateKey privateKey;
-    @Value("${jwt.private.key}")
-    RSAPrivateKey privateKey;
+    private final RSAPrivateKey privateKey;
+//    @Value("${jwt.private.key}")
+//    RSAPrivateKey privateKey;
 
 
     private final CustomBasicAuthenticationEntryPoint customBasicAuthenticationEntryPoint;
