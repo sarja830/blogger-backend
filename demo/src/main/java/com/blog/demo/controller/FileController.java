@@ -43,6 +43,7 @@ public class FileController {
             result = imageUploaderService.uploadFile(file);
         } catch (IOException e) {
             log.error("Failed to upload file: " + e.getMessage());
+            log.error("Failed to upload file: " + e);
             return (ResponseEntity<Object>) ResponseEntity.internalServerError();
         } catch (Exception e) {
             log.error("some exception occured in uploading file: " + e);
