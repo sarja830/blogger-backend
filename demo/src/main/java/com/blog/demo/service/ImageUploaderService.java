@@ -25,7 +25,7 @@ public class ImageUploaderService {
     private final MinioClient minioClient;
     @Value("${minio.bucketName}")
     private String bucketName;
- @Value("${minio.url}")
+    @Value("${minio.url}")
     private String minioServerUrl;
 
     public String uploadFile(MultipartFile file) throws IOException, ServerException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
