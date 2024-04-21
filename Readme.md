@@ -1,4 +1,11 @@
 
+### ACTIVE BUGS
+1. Scrollabe
+2. 
+
+
+
+
 
 ### Blogger-Infrastucture-Setup
 

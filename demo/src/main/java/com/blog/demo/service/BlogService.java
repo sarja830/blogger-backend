@@ -307,6 +307,7 @@ public class BlogService {
                             .username(b.getAuthor().getUsername())
                             .email(b.getAuthor().getEmail())
                             .name(b.getAuthor().getName())
+                            .profileImage(b.getAuthor().getProfileImage())
                             .build())
 //                    .categoryId(b.getCategory().getId())
                     .id(b.getId())
