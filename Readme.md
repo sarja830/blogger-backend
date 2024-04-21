@@ -62,7 +62,7 @@ TOKEN: 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
    // to build a local image
    docker build  -t blog/backendappv1 .
    // to run the local image
-   docker run -p 8080:8080 blog/backendappv1
+  docker run  -it -d --network=host -p 8080:8080 blog/backendappv1 
    // to list the old images
    docker images 
    // delete the old version once the new version has been setup
