@@ -6,7 +6,6 @@
 
 
 
-
 ### Blogger-Infrastucture-Setup
 
 For deployment of resource to remote server just typoe in
@@ -21,12 +20,43 @@ scp docker-compose.yaml root@104.236.197.121:/
 docker compose up -d
 ```
 
+3. create new bucket blog and update the access to custom:
+ get the access keys for the bucket and update the application properties
+```
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "PublicRead",
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": [
+                    "*"
+                ]
+            },
+            "Action": [
+                "s3:GetObject"
+            ],
+            "Resource": [
+                "arn:aws:s3:::blog/*"
+            ]
+        }
+    ]
+}
+```
+
+
 ### DEPLOYMENT:
+
+#### Backend:
 1. The project is build on java 17
 2. export JAVA_HOME=`/usr/libexec/java_home -v 17` run this command if needed
 3. Run a build locally using. ```mvn clean package``` with the updated properties
 4. Refer https://spring.io/guides/topicals/spring-boot-docker
 5. On the server run the following commands to deploy the application
+
+TOKEN: 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
+
 
    ```shell
    // to build a local image
@@ -39,9 +69,18 @@ docker compose up -d
     docker rmi 1af15e84ae97
     ```
 
+#### frontend:
+1. The project is build on node 18.14.0
+2. Run the following commands to deploy the frontend
+```shell
+//for the first time
+pm2 --name frontend serve --spa dist 5173
 
 
-
+pm2 restart 0
+// or 
+pm2 restart frontend
+````
 
 
 
@@ -147,29 +186,4 @@ DEPLOYMENT:
 ssh root@104.236.197.121      
 
  docker-compose -f docker-compose-minio.yml -d
-```
-
-create new bucket blog and update the access to custom:
-get the access keys for the bucket
-```
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Sid": "PublicRead",
-            "Effect": "Allow",
-            "Principal": {
-                "AWS": [
-                    "*"
-                ]
-            },
-            "Action": [
-                "s3:GetObject"
-            ],
-            "Resource": [
-                "arn:aws:s3:::blog/*"
-            ]
-        }
-    ]
-}
 ```
