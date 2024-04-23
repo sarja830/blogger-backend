@@ -3,6 +3,8 @@ package com.blog.demo.Elastic.controller;
 import com.blog.demo.Elastic.model.BlogSearch;
 import com.blog.demo.Elastic.service.BlogSearchService;
 import com.blog.demo.dto.BlogDTO;
+import com.blog.demo.exceptions.Result;
+import com.blog.demo.exceptions.StatusCode;
 import com.blog.demo.model.blog.Blog;
 import com.blog.demo.service.BlogService;
 import lombok.AllArgsConstructor;
@@ -22,18 +24,23 @@ public class BlogSearchController {
     private final BlogSearchService blogSearchService;
 
     @GetMapping("")
-    public List<BlogDTO> search(@RequestParam(value = "query") String query,
-                                @RequestParam(value = "page", defaultValue = "0") int page,
-                                @RequestParam(value = "pageSize", defaultValue = "10") int pageSize
+    public Result search(@RequestParam(value = "query") String query,
+                         @RequestParam(value = "page", defaultValue = "0") int page,
+                         @RequestParam(value = "pageSize", defaultValue = "10") int pageSize
                                 ) {
-        return blogSearchService.search(query,page,pageSize);
+
+        return new Result(true, StatusCode.SUCCESS, "Search results",
+                blogSearchService.search(query,page,pageSize));
+
+
     }
     @GetMapping("/users")
-    public List<BlogDTO> searchUser(@RequestParam(value = "query") String query,
+    public Result searchUser(@RequestParam(value = "query") String query,
                                     @RequestParam(value = "page", defaultValue = "0") int page,
                                     @RequestParam(value = "pageSize", defaultValue = "10") int pageSize)
     {
-        return blogSearchService.searchByUser(query,page,pageSize);
+        return new Result(true, StatusCode.SUCCESS, "Search results",
+                blogSearchService.searchByUser(query,page,pageSize));
     }
 
     @PostMapping("")
