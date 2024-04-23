@@ -7,18 +7,20 @@ ssh root@104.236.197.121
 
 ### Blogger-Infrastucture-Setup ( to be done at the startup)
 
-1. From local to server
+For deployment of resource to remote server just typoe in
+1. Dont rerun it run it once during startup
+
+3. From local to server
 ```shell 
 scp docker-compose.yaml root@104.236.197.121:/
 ```
-
 2. copy the docker compose to the server and then run the
 ```shell
 docker compose up -d
 ```
-
-3. Login to the minio admin console: http://104.236.197.121:9001/login 
-4. create new bucket blog and update the access to custom:
+3. Login to the minio admin console: http://104.236.197.121:9001/login
+   create new bucket blog and update the access to custom:
+ get the access keys for the bucket and update the application properties
 ```
 {
     "Version": "2012-10-17",
@@ -41,14 +43,18 @@ docker compose up -d
     ]
 }
 ```
-5. get the access keys for the bucket and update the application.properties file
 
-### backend deployment:
+
+### DEPLOYMENT:
+
+#### Backend:
 1. The project is build on java 17
 2. export JAVA_HOME=`/usr/libexec/java_home -v 17` run this command if needed
 3. Run a build locally using. ```mvn clean package``` with the updated properties
 4. Refer https://spring.io/guides/topicals/spring-boot-docker
 5. On the server run the following commands to deploy the application
+
+TOKEN: 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
 
 ```shell
   export JAVA_HOME=`/usr/libexec/java_home -v 17`
@@ -57,92 +63,31 @@ docker compose up -d
 ```
 
 
+
    ```shell
-   //github token
-   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
-   
-   //go to demo folder
-   cd blogger-backend/demo
    // to build a local image
    docker build  -t blog/backendappv1 .
    // to run the local image
-   
-    docker run  -it -d --network=host -p 8080:8080 blog/backendappv1 
-
-   
-   cd .
+  docker run  -it -d --network=host -p 8080:8080 blog/backendappv1 
    // to list the old images
-   
-   docker images
-   
-   // to list all the containers  (docker ps) for running containers
-   docker ps -a  
-   docker rm  1af15e84ae97 skajdewrfdqwe
-   // list images 
-   docker images
-   docker image rm 1af15e84ae97 
+   docker images 
+   // delete the old version once the new version has been setup
+    docker rmi 1af15e84ae97
     ```
 
-
-
-### frontend deployment:
-# React + Vite
-
-For production build
-``` JavaScript
-//to create a production build)
-npm run build
-
-//to serve the production build
-serve -s dist -l 4000
-
-// in production serve using pm2 ~/blogger-frontend/client# pm2 serve dist 5173
- pm2 serve dist 5173
-
-#if already running then restart the server 
-  pm2 restart  static-page-server-5173 
-
-    
-```
-
-// to stop a running docker container
-docker stop image_id
-// to remove a runnign docker container
-docker rm image_id
-
-
-NGINX etc/nginx/sites-available/default
+#### frontend:
+1. The project is build on node 18.14.0
+2. Run the following commands to deploy the frontend
 ```shell
-
- location  /api/ {
-        proxy_pass http://localhost:8080/api/; #whatever port your app runs on
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
-    }
+//for the first time
+pm2 --name frontend serve --spa dist 5173
 
 
- location   /minio/ {
-        proxy_pass http://localhost:9000/; #whatever port your app runs on
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
-   }
+pm2 restart 0
+// or 
+pm2 restart frontend
+````
 
- location / {
-        proxy_pass http://localhost:5173/; #whatever port your app runs on
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
-    }
-
-```
 
 
 
@@ -250,6 +195,8 @@ BUGS:
 
 
 
+ docker-compose -f docker-compose-minio.yml -d
+```
 
 
 
