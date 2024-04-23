@@ -111,14 +111,17 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/votes").hasAnyRole("ADMIN", "USER", "AUTHOR")
                         .requestMatchers(HttpMethod.DELETE, "/api/votes").hasAnyRole("ADMIN", "USER", "AUTHOR")
                         .requestMatchers(HttpMethod.PUT, "/api/votes").hasAnyRole("ADMIN", "USER", "AUTHOR")
+
+                        .requestMatchers(HttpMethod.POST, "/api/search").hasAnyRole("ADMIN", "AUTHOR")
+                        .requestMatchers(HttpMethod.GET, "/api/search").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/search/*").permitAll()
+
+                        //categories
                         .requestMatchers(HttpMethod.GET, "/api/categories").permitAll()
-//                        .requestMatchers(HttpMethod.POST, "/api/categories").hasRole("ADMIN")
-//                        .requestMatchers(HttpMethod.DELETE, "/api/categories").hasRole("ADMIN")
-//                        .requestMatchers(HttpMethod.PUT, "/api/categories").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/api/categories").permitAll()
-                        .requestMatchers(HttpMethod.DELETE, "/api/categories").permitAll()
-                        .requestMatchers(HttpMethod.PUT, "/api/categories").permitAll()
-                        //for testing
+                        .requestMatchers(HttpMethod.POST, "/api/categories").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/categories").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/categories").hasRole("ADMIN")
+
 
                         .requestMatchers(HttpMethod.GET, "/users").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/users").hasRole("ADMIN")

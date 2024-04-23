@@ -15,6 +15,7 @@ import java.util.*;
 public interface BlogRepository extends JpaRepository<Blog, Long> {
 
     Optional<Blog> findByIdAndDraft(Long id,Boolean draft);
+    Optional<Blog> findById(Long id);
     Optional<Blog> findByIdAndAuthorId(Long id,Long authorId);
 
 

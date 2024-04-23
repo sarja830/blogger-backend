@@ -1,5 +1,7 @@
 package com.blog.demo.controller;
 
+import com.blog.demo.Elastic.model.BlogSearch;
+import com.blog.demo.Elastic.service.BlogSearchService;
 import com.blog.demo.dto.BlogDTO;
 import com.blog.demo.exceptions.Result;
 import com.blog.demo.exceptions.StatusCode;
@@ -27,6 +29,7 @@ public class BlogController {
     private final BlogService blogService;
     private final AuthService authService;
     private final CategoryService categoryService;
+    private final BlogSearchService blogSearchService;
 
     @GetMapping("")
     @ResponseStatus(HttpStatus.ACCEPTED)
@@ -148,8 +151,7 @@ public class BlogController {
     @ResponseStatus(HttpStatus.ACCEPTED)
     public Result createBlog(@RequestBody BlogDTO blogDTO,@AuthenticationPrincipal Jwt jwt) {
         User author =  authService.getUserFromJwt(jwt);
-        blogService.createBlog(blogDTO,author);
-        return new Result(true, StatusCode.SUCCESS, "Blog created successfully");
+        return new Result(true, StatusCode.SUCCESS, "Blog created successfully",blogService.createBlog(blogDTO,author));
     }
     //    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     @DeleteMapping("")

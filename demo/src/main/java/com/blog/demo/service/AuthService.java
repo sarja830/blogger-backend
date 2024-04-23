@@ -75,6 +75,7 @@ public class AuthService {
                 .name(registerRequest.getName())
                 .email(registerRequest.getEmail())
                 .password(passwordEncoder.encode(registerRequest.getPassword()))
+                .profileImage(new String("https://i.imgur.com/HeIi0wU.png"))
                 .created(new Date())
                 .roleType(RoleType.USER)
                 .enabled(false)
@@ -112,7 +113,9 @@ public class AuthService {
         return "Account Activated Successfully";
     }
     public AuthenticationResponse login(LoginRequest loginRequest) {
-        Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(),
+        User user = userRepository.findByEmail(loginRequest.getEmail()) .orElseThrow(() -> new UsernameNotFoundException("No user " +
+                "Found with email : " + loginRequest.getEmail()));
+        Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(),
                 loginRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authenticate);
         String token = jwtProvider.generateToken(authenticate);
@@ -120,8 +123,8 @@ public class AuthService {
                 .authenticationToken(token)
 //                .refreshToken(refreshTokenService.generateRefreshToken(loginRequest.getUsername()).getToken())
                 .expiresAt(Instant.now().plusMillis(jwtProvider.getJwtExpirationInMillis()))
-                .username(loginRequest.getUsername())
-                .role(userRepository.findByUsername(loginRequest.getUsername()).get().getRoleType().name())
+                .username(user.getUsername())
+                .role(user.getRoleType().name())
                 .build();
     }
 

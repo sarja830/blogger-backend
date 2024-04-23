@@ -8,8 +8,10 @@ import lombok.Data;
 @AllArgsConstructor
 @Builder
 public class AuthorDTO {
+    Long id;
     private String username;
     private String name;
 
     private String email;
+    private String profileImage;
 }

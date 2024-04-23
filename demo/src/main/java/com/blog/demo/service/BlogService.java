@@ -1,6 +1,7 @@
 package com.blog.demo.service;
 
 
+import com.blog.demo.Elastic.model.BlogSearch;
 import com.blog.demo.dto.AuthorDTO;
 import com.blog.demo.dto.BlogDTO;
 
@@ -39,7 +40,7 @@ public class BlogService {
     private final CategoryRepository categoryRepository;
 
 
-    public void createBlog(BlogDTO blogDTO,  User author) {
+    public Long createBlog(BlogDTO blogDTO,  User author) {
 
 
         if(blogDTO.getCategoryId()==null)
@@ -76,8 +77,8 @@ public class BlogService {
                     .lastUpdated(new Date())
                     .build();
 
-            blogRepository.save(blog);
-            return;
+            Long blogId = blogRepository.save(blog).getId();
+            return blogId;
         }
         catch (Exception e)
         {
@@ -230,8 +231,8 @@ public class BlogService {
                 .categoryId(blog.getCategory().getId())
                 .build();
     }
-    public BlogDTO getBlogByIdByAuthor(Long blogId,Long userId) {
-        Blog blog = blogRepository.findByIdAndAuthorId(blogId,userId).orElseThrow(() -> new ErrorResponseException(HttpStatus.BAD_REQUEST,new Throwable("Blog id is not valid")));
+    public BlogDTO getBlogByIdByAuthor(Long blogId,Long authorId) {
+        Blog blog = blogRepository.findByIdAndAuthorId(blogId,authorId).orElseThrow(() -> new ErrorResponseException(HttpStatus.BAD_REQUEST,new Throwable("Blog id is not valid")));
         BlogContent blogContent = blogContentRepository.findById(blog.getContentId()).orElseThrow(() -> new ErrorResponseException(HttpStatus.BAD_REQUEST,new Throwable("Blog content id is not valid")));
         return BlogDTO.builder()
                 .title(blog.getTitle())
@@ -304,9 +305,11 @@ public class BlogService {
                     .title(b.getTitle())
                     .banner(b.getBanner())
                     .author(AuthorDTO.builder()
+                            .id(b.getAuthor().getId())
                             .username(b.getAuthor().getUsername())
                             .email(b.getAuthor().getEmail())
                             .name(b.getAuthor().getName())
+                            .profileImage(b.getAuthor().getProfileImage())
                             .build())
 //                    .categoryId(b.getCategory().getId())
                     .id(b.getId())
