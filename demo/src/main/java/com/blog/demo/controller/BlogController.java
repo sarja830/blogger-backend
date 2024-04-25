@@ -114,7 +114,7 @@ public class BlogController {
 
     @GetMapping("/count")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public Result getBlogCountAuthor(
+    public Result getBlogCountPublic(
             @RequestParam(value="category_id",required=false) List<Long> categoryIds,
             @RequestParam(value="author_id",required=false) List<Long> authorIds
     )

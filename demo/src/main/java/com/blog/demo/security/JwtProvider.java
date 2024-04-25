@@ -25,23 +25,24 @@ public class JwtProvider {
     @Value("${jwt.expiration.time}")
     private Long jwtExpirationInMillis;
 
-    public String generateToken(Authentication authentication) {
+    public String generateToken(Authentication authentication, com.blog.demo.model.user.User user) {
 
         String authorities = authentication.getAuthorities().stream()
                 .map(grantedAuthority -> grantedAuthority.getAuthority())
                 .collect(Collectors.joining(" "));// MUST BE space-delimited
         log.info("authorities: " + authorities);
         User principal = (User) authentication.getPrincipal();
-        return generateTokenWithUserName(principal.getUsername(), authorities);
+        return generateTokenWithUserName(principal.getUsername(), authorities,user.getId());
     }
 
-    public String generateTokenWithUserName(String username, String authorities) {
+    public String generateTokenWithUserName(String username, String authorities, Long id) {
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuer("self")
                 .issuedAt(Instant.now())
                 .expiresAt(Instant.now().plusMillis(jwtExpirationInMillis))
                 .subject(username)
                 .claim("authorities", authorities)
+                .id(String.valueOf(id))
                 .build();
         log.info("claims: " + claims);
         for(String key: claims.getClaims().keySet()){

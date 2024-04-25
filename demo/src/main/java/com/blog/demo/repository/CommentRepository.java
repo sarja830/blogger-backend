@@ -26,6 +26,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     @Query("SELECT c.id as id," +
             " c.comment as comment," +
             " c.isDeleted as isDeleted," +
+            " c.isUpdated as isUpdated," +
             " c.createdDate as createdDate," +
             " c.updatedDate as updatedDate," +
             " c.parentComment.id as parentCommentId," +

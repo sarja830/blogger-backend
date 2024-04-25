@@ -47,14 +47,9 @@ public class BlogSearch {
     @Field(type = FieldType.Keyword, name = "categoryName")
     private String categoryName;
 
-    private  Integer voteCount;
-
-    private  Integer commentCount;
-
-    private  Integer viewCount;
     private String banner;
     @Field(type = FieldType.Date, format = DateFormat.basic_date_time)
     private Date created;
-    @Field(type = FieldType.Keyword, name = "tags")
+
     private List<String> tags;
 }

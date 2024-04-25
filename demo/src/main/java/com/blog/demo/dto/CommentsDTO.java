@@ -20,8 +20,8 @@ import java.util.Date;
 public class CommentsDTO{
         private Long id;
         private String comment;
-        private Date createdDate;
-        private Date updatedDate;
+        private Instant createdDate;
+        private Instant updatedDate;
         private Comment parentComment;
         private User commentor;
         private Blog blog;

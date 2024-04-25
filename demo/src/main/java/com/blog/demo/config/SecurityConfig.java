@@ -114,7 +114,7 @@ public class SecurityConfig {
 
                         .requestMatchers(HttpMethod.POST, "/api/search").hasAnyRole("ADMIN", "AUTHOR")
                         .requestMatchers(HttpMethod.GET, "/api/search").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/search/*").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/search/**").permitAll()
 
                         //categories
                         .requestMatchers(HttpMethod.GET, "/api/categories").permitAll()
@@ -122,10 +122,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/categories").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/categories").hasRole("ADMIN")
 
+                        //bio
+                        .requestMatchers(HttpMethod.GET, "/api/bio").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/api/bio/**").hasAnyRole("ADMIN", "USER", "AUTHOR")
 
-                        .requestMatchers(HttpMethod.GET, "/users").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/users").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/users").hasRole("ADMIN")
                         .requestMatchers(EndpointRequest.to("health", "info", "prometheus")).permitAll()
                         .requestMatchers(EndpointRequest.toAnyEndpoint().excluding("health", "info", "prometheus")).hasAuthority("ROLE_admin")
                         .requestMatchers(AntPathRequestMatcher.antMatcher("/h2-console/**")).permitAll() // Explicitly fallback to antMatcher inside requestMatchers.

@@ -55,7 +55,6 @@ public class BlogService {
                 .content(blogDTO.getContent())
                 .tags(blogDTO.getTags())
                 .created(new Date())
-                .lastUpdated(new Date() )
                 .images(blogDTO.getImages())
                 .build();
 
@@ -216,6 +215,8 @@ public class BlogService {
                 .author(AuthorDTO.builder()
                         .username(blog.getAuthor().getUsername())
                         .email(blog.getAuthor().getEmail())
+                        .id(blog.getAuthor().getId())
+                        .profileImage(blog.getAuthor().getProfileImage())
                         .name(blog.getAuthor().getName())
                         .build())
                 .created(blog.getCreated())
@@ -242,6 +243,7 @@ public class BlogService {
                 .author(AuthorDTO.builder()
                         .username(blog.getAuthor().getUsername())
                         .email(blog.getAuthor().getEmail())
+                        .profileImage(blog.getAuthor().getProfileImage())
                         .name(blog.getAuthor().getName())
                         .build())
                 .created(blog.getCreated())

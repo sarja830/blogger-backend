@@ -110,7 +110,7 @@ public class ExceptionHandlerAdvice {
     @ExceptionHandler(InvalidBearerTokenException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     Result handleInvalidBearerTokenException(InvalidBearerTokenException ex) {
-        return new Result(false, StatusCode.UNAUTHORIZED, "The access token provided is expired, revoked, malformed, or invalid for other reasons.", ex.getMessage());
+        return new Result(false, StatusCode.UNAUTHORIZED, "The access token provided is expired, revoked, malformed, or invalid for other reasons. Please login again.", ex.getMessage());
     }
 
     @ExceptionHandler(AccessDeniedException.class)

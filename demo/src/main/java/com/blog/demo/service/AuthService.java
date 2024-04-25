@@ -8,6 +8,8 @@ import com.blog.demo.model.NotificationEmail;
 import com.blog.demo.model.VerificationToken;
 import com.blog.demo.model.user.RoleType;
 import com.blog.demo.model.user.User;
+import com.blog.demo.model.user.UserBio;
+import com.blog.demo.repository.UserBioRepository;
 import com.blog.demo.repository.UserRepository;
 import com.blog.demo.repository.VerificationTokenRepository;
 import com.blog.demo.security.JwtProvider;
@@ -40,6 +42,7 @@ public class AuthService {
 
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
+    private final UserBioRepository userBioRepository;
     private final VerificationTokenRepository verificationTokenRepository;
     private final MailService mailService;
     private final AuthenticationManager authenticationManager;
@@ -81,7 +84,8 @@ public class AuthService {
                 .enabled(false)
                 .build();
 
-        userRepository.save(user);
+        User savedUser = userRepository.save(user);
+        userBioRepository.save(UserBio.builder().user(savedUser).build());
 
         //generate token
         String token = generateVerificationTokenAndSave(user);
@@ -118,12 +122,15 @@ public class AuthService {
         Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(),
                 loginRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authenticate);
-        String token = jwtProvider.generateToken(authenticate);
+        String token = jwtProvider.generateToken(authenticate,user);
         return AuthenticationResponse.builder()
                 .authenticationToken(token)
 //                .refreshToken(refreshTokenService.generateRefreshToken(loginRequest.getUsername()).getToken())
                 .expiresAt(Instant.now().plusMillis(jwtProvider.getJwtExpirationInMillis()))
                 .username(user.getUsername())
+                .name(user.getName())
+                .id(user.getId())
+                .profileImage(user.getProfileImage())
                 .role(user.getRoleType().name())
                 .build();
     }

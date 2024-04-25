@@ -12,6 +12,7 @@ import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
 
 
+import java.time.Instant;
 import java.util.Date;
 
 
@@ -29,11 +30,13 @@ public class Comment {
     @Column(columnDefinition = "TEXT")
 //    PostgreSQLCITextType
     private String comment;
-    private Date createdDate;
-
+    private Instant createdDate;
+    private Instant updatedDate;
     @Builder.Default
     private Boolean isDeleted=false;
-    private Date updatedDate;
+    @Builder.Default
+    private Boolean isUpdated=false;
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")

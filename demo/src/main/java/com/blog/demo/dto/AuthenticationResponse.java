@@ -12,9 +12,12 @@ import java.time.Instant;
 @Builder
 public class AuthenticationResponse {
     private String authenticationToken;
+    private Long id;
+    private String profileImage;
     private String refreshToken;
     private Instant expiresAt;
     private String username;
+    private String name;
     private String role;
 }
 

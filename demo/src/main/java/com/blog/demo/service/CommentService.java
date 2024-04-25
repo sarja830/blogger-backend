@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.ErrorResponseException;
 
+import java.time.Instant;
 import java.util.*;
 
 
@@ -40,6 +41,7 @@ public class CommentService {
         if(!user.equals(commentRef.getCommentor()))
             throw new ErrorResponseException(HttpStatus.BAD_REQUEST,new Throwable("You are not authorized to delete this comment"));
         commentRef.setIsDeleted(true);
+        commentRef.setUpdatedDate(Instant.now());
         commentRepository.save(commentRef);
 
     }
@@ -50,6 +52,8 @@ public class CommentService {
         if(!user.equals(commentRef.getCommentor()))
             throw new ErrorResponseException(HttpStatus.BAD_REQUEST,new Throwable("You are not authorized to delete this comment"));
         commentRef.setComment(updateCommentRequestDTO.getComment());
+        commentRef.setUpdatedDate(Instant.now());
+        commentRef.setIsUpdated(true);
         commentRepository.save(commentRef);
 
     }
@@ -103,8 +107,8 @@ public class CommentService {
             parentComment =commentRepository.getReferenceById(commentRequestDTO.getParentCommentId());
         Comment comment = Comment.builder()
                 .comment(commentRequestDTO.getComment())
-                .createdDate(new Date())
-                .updatedDate(new Date())
+                .createdDate(Instant.now())
+                .updatedDate(Instant.now())
                 .commentor(commenter)
                 .blog(blog)
                 .parentComment(parentComment)

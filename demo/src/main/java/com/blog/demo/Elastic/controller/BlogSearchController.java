@@ -26,13 +26,15 @@ public class BlogSearchController {
     @GetMapping("")
     public Result search(@RequestParam(value = "query") String query,
                          @RequestParam(value = "page", defaultValue = "0") int page,
-                         @RequestParam(value = "pageSize", defaultValue = "10") int pageSize
-                                ) {
+                         @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
 
         return new Result(true, StatusCode.SUCCESS, "Search results",
                 blogSearchService.search(query,page,pageSize));
-
-
+    }
+    @GetMapping("/count")
+    public Result searchCount(@RequestParam(value = "query") String query) {
+        return new Result(true, StatusCode.SUCCESS, "Search results",
+                blogSearchService.searchResultCount(query));
     }
     @GetMapping("/users")
     public Result searchUser(@RequestParam(value = "query") String query,
@@ -41,6 +43,12 @@ public class BlogSearchController {
     {
         return new Result(true, StatusCode.SUCCESS, "Search results",
                 blogSearchService.searchByUser(query,page,pageSize));
+    }
+    @GetMapping("/users/count")
+    public Result searchUserCount(@RequestParam(value = "query") String query)
+    {
+        return new Result(true, StatusCode.SUCCESS, "Search results count",
+                blogSearchService.countByUser(query));
     }
 
     @PostMapping("")

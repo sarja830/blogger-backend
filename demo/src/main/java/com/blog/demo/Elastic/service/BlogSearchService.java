@@ -50,11 +50,12 @@ public class BlogSearchService {
                     .build();
             BlogDTO blogDTO = BlogDTO.builder()
                     .id(blogSearchDTO.getId())
+                    .banner(blogSearchDTO.getBanner())
                     .title(blogSearchDTO.getTitle())
                     .content(blogSearchDTO.getContent())
-                    .voteCount(blogSearchDTO.getVoteCount())
-                    .commentCount(blogSearchDTO.getCommentCount())
-                    .viewCount(blogSearchDTO.getViewCount())
+//                    .voteCount(blogSearchDTO.getVoteCount())
+//                    .commentCount(blogSearchDTO.getCommentCount())
+//                    .viewCount(blogSearchDTO.getViewCount())
                     .description(blogSearchDTO.getDescription())
                     .draft(blogSearchDTO.getDraft())
                     .author(authorDTO)
@@ -73,11 +74,20 @@ public class BlogSearchService {
         Page<BlogSearch> blogSearchDTOList = blogSearchRepository.findByTitleOrContentOrDescriptionUsingCustomQuery(query, pageable);
         return TransformBlogSearchDTOToBlogDTO(blogSearchDTOList);
     }
+    public Long searchResultCount(String query) {
+
+        Long count = blogSearchRepository.CountByTitleOrContentOrDescription(query);
+        return count;
+    }
     public List<BlogDTO> searchByUser(String query, Integer page, Integer pageSize) {
         Sort sort = Sort.by("created").descending();
         Pageable pageable = PageRequest.of(page,pageSize,sort);
         Page<BlogSearch> blogSearchDTOList = blogSearchRepository.findUser( query, pageable);
         return TransformBlogSearchDTOToBlogDTO(blogSearchDTOList);
+    }
+    public Long  countByUser(String query) {
+     Long count = blogSearchRepository.CountUser( query);
+     return count;
     }
     public void sync(Long id) {
         log.info("Syncing blog to Elastic search with id: "+ id);
@@ -93,9 +103,6 @@ public class BlogSearchService {
                 .profileImage(blog.getAuthor().getProfileImage())
                 .name(blog.getAuthor().getName())
                 .username(blog.getAuthor().getUsername())
-                .voteCount(blog.getVoteCount())
-                .viewCount(blog.getViewCount())
-                .commentCount(blog.getCommentCount())
                 .created(blog.getCreated())
                 .banner(blog.getBanner())
                 .tags(blogContent.getTags())
