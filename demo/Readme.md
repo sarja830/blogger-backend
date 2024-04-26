@@ -44,7 +44,8 @@ docker compose up -d
 }
 ```
 
-
+change permission for elastic search
+chmod -R 777 ./elastic-data
 ### DEPLOYMENT:
 
 #### Backend:
