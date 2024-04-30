@@ -109,7 +109,6 @@ public class BlogSearchService {
                 .categoryId(blog.getCategory().getId())
                 .categoryName(blog.getCategory().getName())
                 .build();
-
-        blogSearchRepository.save(blogSearch);
+            blogSearchRepository.save(blogSearch);
     }
 }

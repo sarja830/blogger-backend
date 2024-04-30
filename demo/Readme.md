@@ -88,6 +88,10 @@ pm2 restart 0
 // or 
 pm2 restart frontend
 ````
+if you are getting error 
+```shell
+clone everytime and then start the frontend build.
+``` 
 
 
 
@@ -135,7 +139,12 @@ https://www.baeldung.com/spring-data-jpa-pagination-sorting
 For comments:
 https://codesandbox.io/p/github/swastikpatro/nested-comments/main?file=%2Fsrc%2FApp.tsx%3A3%2C18
 
+Spring Security:
+https://engineering.backmarket.com/oauth2-explained-with-cute-shapes-7eae51f20d38
 
+Code in spring
+https://medium.com/@iyusubov444/springboot3-oauth2-login-default-config-part-1-c35ca2934818
+https://medium.com/@iyusubov444/springboot3-oauth2-login-save-user-info-part-2-f36f5aa5d458
 
 #### JPA's cascade = REMOVE and Hibernate's @OnDelete used together?
 Let's say you have a one-to-one directional relationship
@@ -184,6 +193,7 @@ voteType = 2 -> downvote
 5. Search functionality - elastic search
 3. Check for jmeter to test application
 4. Logging using actutator 
+5. handle delete of elastic search
 
 ### Docker Compose
 https://www.youtube.com/watch?v=gFjpv-nZO0U
